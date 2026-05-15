@@ -1,0 +1,37 @@
+{
+    "droid arabic kufi": {
+        "normal": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/droid_arabic_kufi_normal_388924581109e64fe84479eaa151bf92",
+        "bold": "droid_arabic_kufi_bold_a9146909d1490c85dd9df647fd8cb588"
+    },
+    "noto sans arabic": {
+        "100": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_100_dd7c1346ddd99b5c7df335255123e53e",
+        "200": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_200_822b32c7d3a4ad5f25eff2ef25048d7f",
+        "300": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_300_5e50393306b0d36c6795b320a163d80a",
+        "normal": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_normal_af478fbc5452aac923b48d4fcbcdda8b",
+        "500": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_500_9d2b12341d6e27a79b3b23547bddca25",
+        "600": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_600_7f6d0c95caa75f89acd1a5b5174a2a2d",
+        "bold": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_bold_5e3b957b4a26285387391fe304312cb9",
+        "800": "D:\\Inetpub\\vhosts\\baul-factory.com\\httpdocs\\storage\\fonts\/noto_sans_arabic_800_29ed7ac73eaaa8c31298b7c33933a5be",
+        "900": "noto_sans_arabic_900_75e0316ba862ba4aa6d718fed870a097"
+    },
+    "solaimanlipi": {
+        "normal": "solaimanlipi_normal_23f1dfea7d0e8cda644946715a15eb48"
+    },
+    "font awesome 6 brands": {
+        "normal": "font_awesome_6_brands_normal_a0692eaa0f5ac2568c685c946992ab4b"
+    },
+    "font awesome 6 free": {
+        "normal": "E:\\xampp\\htdocs\\iproduction\\storage\\fonts\/font_awesome_6_free_normal_4aee77060c51da130ac35c29423e93d9",
+        "900": "font_awesome_6_free_900_de3fbcb9c47fd513ef75606a4c3bea84"
+    },
+    "font awesome 5 brands": {
+        "normal": "font_awesome_5_brands_normal_a0692eaa0f5ac2568c685c946992ab4b"
+    },
+    "font awesome 5 free": {
+        "900": "E:\\xampp\\htdocs\\iproduction\\storage\\fonts\/font_awesome_5_free_900_de3fbcb9c47fd513ef75606a4c3bea84",
+        "normal": "font_awesome_5_free_normal_4aee77060c51da130ac35c29423e93d9"
+    },
+    "fontawesome": {
+        "normal": "fontawesome_normal_f298d0253e6d25aac57ec8b37ed23369"
+    }
+}

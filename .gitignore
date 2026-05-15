@@ -1,0 +1,62 @@
+# Laravel
+/public/storage
+/storage/*.key
+/storage/app/public
+/storage/debugbar
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Ignore everything in storage except important folders
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Environment files
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+
+# Composer
+/vendor/
+
+# Node
+/node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-lock.yaml
+
+# Vite / Mix
+/public/build
+/public/hot
+/public/mix-manifest.json
+
+# IDE Files
+/.idea
+/.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.phpunit.cache
+
+# Cache Files
+bootstrap/cache/*.php
+bootstrap/cache/packages.php
+bootstrap/cache/services.php
+
+# Sail
+docker-compose.override.yml
+
+# Misc
+*.log

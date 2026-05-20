@@ -65,6 +65,12 @@ class ProductionController extends Controller
         return view('pages.manufacture.manufactures', compact('title', 'obj', 'finishProduct', 'customers', 'status', 'product_id', 'batch_no', 'customer'));
     }
 
+
+
+    public function dashboard()
+{
+    return view('pages.manufacture.dashboard');
+}
     /**
      * Show the form for creating a new resource.
      *

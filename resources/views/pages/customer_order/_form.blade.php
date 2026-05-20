@@ -1,5 +1,5 @@
 @php
-    $orderType = isset($customerOrder->order_type) && $customerOrder->order_type ? $customerOrder->order_type : '';
+$orderType = isset($customerOrder->order_type) && $customerOrder->order_type ? $customerOrder->order_type : '';
 @endphp
 <input type="hidden" name="currency" id="only_currency_sign" value={{ getCurrencyOnly() }}>
 <div>
@@ -15,7 +15,7 @@
                     onfocus="select()" readonly>
                 <div class="text-danger d-none"></div>
                 @error('reference_no')
-                    <div class="text-danger">{{ $message }}</div>
+                <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
         </div>
@@ -27,17 +27,17 @@
                 <select name="customer_id" id="customer_id"
                     class="form-control @error('customer_id') is-invalid @enderror select2" placeholder="Please Select">
                     @foreach ($customers as $key => $customer)
-                        <?php
+                    <?php
                         $customer_id = $key;
                         ?>
-                        <option value="{{ $key }}"
-                            {{ isset($customerOrder->customer_id) && $customerOrder->customer_id == $customer_id ? 'selected' : '' }}>
-                            {{ $customer }}</option>
+                    <option value="{{ $key }}"
+                        {{ isset($customerOrder->customer_id) && $customerOrder->customer_id == $customer_id ? 'selected' : '' }}>
+                        {{ $customer }}</option>
                     @endforeach
                 </select>
                 <div class="text-danger d-none"></div>
                 @error('customer_id')
-                    <div class="text-danger">{{ $message }}</div>
+                <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
         </div>
@@ -49,14 +49,14 @@
                 <select name="order_type" id="order_type"
                     class="form-control @error('order_type') is-invalid @enderror select2" placeholder="Please Select">
                     @foreach ($orderTypes as $key => $orderType)
-                        <option value="{{ $key }}"
-                            {{ isset($customerOrder->order_type) && $customerOrder->order_type == $key ? 'selected' : '' }}>
-                            {{ $orderType }}</option>
+                    <option value="{{ $key }}"
+                        {{ isset($customerOrder->order_type) && $customerOrder->order_type == $key ? 'selected' : '' }}>
+                        {{ $orderType }}</option>
                     @endforeach
                 </select>
                 <div class="text-danger d-none"></div>
                 @error('order_type')
-                    <div class="text-danger">{{ $message }}</div>
+                <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
         </div>
@@ -72,7 +72,7 @@
                     value="{{ isset($customerOrder->delivery_date) ? $customerOrder->delivery_date : old('delivery_date') }}">
                 <div class="text-danger d-none"></div>
                 @error('delivery_date')
-                    <div class="text-danger">{{ $message }}</div>
+                <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
         </div>
@@ -87,9 +87,169 @@
                     value="{{ isset($customerOrder->delivery_address) ? $customerOrder->delivery_address : old('delivery_address') }}">
                 <div class="text-danger d-none"></div>
                 @error('delivery_address')
-                    <div class="text-danger">{{ $message }}</div>
+                <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
+        </div>
+
+        <div class="row">
+
+            {{-- Order Date --}}
+            <div class="col-md-4 mb-3">
+                <label>Order Date <span class="text-danger">*</span></label>
+                <input type="date" name="order_date" class="form-control"
+                    value="{{ old('order_date', date('Y-m-d')) }}">
+            </div>
+
+            {{-- Region / Country --}}
+            <div class="col-md-4 mb-3">
+                <label>Region / Country</label>
+
+                <select name="region_country" class="form-control select2">
+
+                    <option value="">Select Region</option>
+
+                    @foreach($regions as $id => $name)
+
+                    <option value="{{ $name }}"
+                        {{ old('region_country', $customerOrder->region_country ?? '') == $name ? 'selected' : '' }}>
+
+                        {{ $name }}
+
+                    </option>
+
+                    @endforeach
+
+                </select>
+            </div>
+
+            {{-- Business Type --}}
+            <div class="col-md-4 mb-3">
+                <div class="form-group">
+                    <label>Business Type</label>
+                    <select name="business_type" class="form-control select2">
+                        <option value="">-- Select --</option>
+                        <option value="Export"
+                            {{ old('business_type', $customerOrder->business_type ?? '') == 'Export' ? 'selected' : '' }}>
+                            Export
+                        </option>
+                        <option value="Domestic"
+                            {{ old('business_type', $customerOrder->business_type ?? '') == 'Domestic' ? 'selected' : '' }}>
+                            Domestic
+                        </option>
+                        <option value="Industrial"
+                            {{ old('business_type', $customerOrder->business_type ?? '') == 'Industrial' ? 'selected' : '' }}>
+                            Industrial
+                        </option>
+                    </select>
+                    @error('business_type')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            {{-- Purpose --}}
+            <div class="col-md-4 mb-3">
+                <label>Purpose</label>
+                <select name="purpose" class="form-control">
+                    <option value="">Select Purpose</option>
+                    <option value="Commercial" {{ old('purpose') == 'Commercial' ? 'selected' : '' }}>
+                        Commercial
+                    </option>
+                    <option value="Sample" {{ old('purpose') == 'Sample' ? 'selected' : '' }}>
+                        Sample
+                    </option>
+                </select>
+            </div>
+
+            {{-- Product / Service --}}
+            <div class="col-md-4 mb-3">
+                <label>Product / Service</label>
+                <input type="text" name="product_service" class="form-control" placeholder="Product / Service"
+                    value="{{ old('product_service') }}">
+            </div>
+
+            {{-- Product Description --}}
+            <div class="col-md-4 mb-3">
+                <label>Product Description</label>
+                <textarea name="product_description" class="form-control"
+                    placeholder="Product description">{{ old('product_description') }}</textarea>
+            </div>
+
+            {{-- Handler --}}
+            <div class="col-md-4 mb-3">
+                <label>Handler</label>
+                <select name="handler_id" class="form-control select2">
+                    <option value="">-- Select --</option>
+
+
+
+                </select>
+            </div>
+
+            {{-- Quantity --}}
+            <div class="col-md-4 mb-3">
+                <label>Quantity</label>
+                <input type="text" name="total_quantity" class="form-control" placeholder="e.g., 500 kg"
+                    value="{{ old('total_quantity') }}">
+            </div>
+
+            {{-- Specifications --}}
+            <div class="col-md-4 mb-3">
+                <label>Specifications</label>
+                <textarea name="specifications" class="form-control"
+                    placeholder="Product specifications">{{ old('specifications') }}</textarea>
+            </div>
+
+            {{-- Sales Person --}}
+            <div class="col-md-4 mb-3">
+                <label>Sales Person</label>
+                <select name="sales_person_id" class="form-control select2">
+                    <option value="">-- Select --</option>
+
+                </select>
+            </div>
+
+            {{-- Dispatch Status --}}
+            <div class="col-md-4 mb-3">
+                <label>Dispatch Status</label>
+                <select name="dispatch_status" class="form-control select2">
+                    <option value="Not Dispatched">Not Dispatched</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Partially Dispatched">Partially Dispatched</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="Delayed">Delayed</option>
+                    <option value="On Hold">On Hold</option>
+                </select>
+            </div>
+
+            {{-- Expected Dispatch Date --}}
+            <div class="col-md-4 mb-3">
+                <label>Expected Dispatch Date</label>
+                <input type="date" name="expected_dispatch_date" class="form-control"
+                    value="{{ old('expected_dispatch_date') }}">
+            </div>
+
+            {{-- Actual Dispatch Date --}}
+            <div class="col-md-4 mb-3">
+                <label>Actual Dispatch Date</label>
+                <input type="date" name="actual_dispatch_date" class="form-control"
+                    value="{{ old('actual_dispatch_date') }}">
+            </div>
+
+            {{-- Delay Days --}}
+            <div class="col-md-4 mb-3">
+                <label>Delay Days</label>
+                <input type="number" name="delay_days" class="form-control" value="{{ old('delay_days', 0) }}">
+            </div>
+
+            {{-- Remarks --}}
+            <div class="col-md-12 mb-3">
+                <label>Remarks</label>
+                <textarea name="remarks" class="form-control" rows="4"
+                    placeholder="Any remarks or special notes...">{{ old('remarks') }}</textarea>
+            </div>
+
         </div>
     </div>
 
@@ -116,107 +276,104 @@
                     <tbody class="add_trm">
                         <?php $i = 0; ?>
                         @if (isset($orderDetails) && $orderDetails)
-                            @foreach ($orderDetails as $key => $value)
-                                <?php $i++; ?>
-                                <tr class="rowCount" data-id="{{ $value->id }}">
-                                    <td class="width_1_p ir_txt_center">{{ $i }}</td>
+                        @foreach ($orderDetails as $key => $value)
+                        <?php $i++; ?>
+                        <tr class="rowCount" data-id="{{ $value->id }}">
+                            <td class="width_1_p ir_txt_center">{{ $i }}</td>
 
-                                    <td>
-                                        <select name="product[]" id="fproduct_id_{{ $i }}"
-                                            class="form-control @error('title') is-invalid @enderror fproduct_id select2">
-                                            <option value="">@lang('index.please_select')</option>
-                                            @foreach ($productList as $product)
-                                                <option value="{{ $product->id }}" @selected($product->id == $value->product_id)>
-                                                    {{ $product->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </td>
+                            <td>
+                                <select name="product[]" id="fproduct_id_{{ $i }}"
+                                    class="form-control @error('title') is-invalid @enderror fproduct_id select2">
+                                    <option value="">@lang('index.please_select')</option>
+                                    @foreach ($productList as $product)
+                                    <option value="{{ $product->id }}" @selected($product->id == $value->product_id)>
+                                        {{ $product->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </td>
 
-                                    <td>
-                                        <input type="number" name="quantity[]" onfocus="this.select();"
-                                            class="check_required form-control @error('title') is-invalid @enderror integerchk quantity_c"
-                                            placeholder="Quantity" value="{{ $value->quantity }}"
-                                            id="quantity_{{ $i }}">
-                                    </td>
+                            <td>
+                                <input type="number" name="quantity[]" onfocus="this.select();"
+                                    class="check_required form-control @error('title') is-invalid @enderror integerchk quantity_c"
+                                    placeholder="Quantity" value="{{ $value->quantity }}" id="quantity_{{ $i }}">
+                            </td>
 
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="text" name="unit_price[]" onfocus="this.select();"
-                                                class="check_required form-control @error('title') is-invalid @enderror integerchk unit_price_c"
-                                                placeholder="Unit Price" value="{{ $value->unit_price }}"
-                                                id="unit_price_{{ $i }}">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="text" name="unit_price[]" onfocus="this.select();"
+                                        class="check_required form-control @error('title') is-invalid @enderror integerchk unit_price_c"
+                                        placeholder="Unit Price" value="{{ $value->unit_price }}"
+                                        id="unit_price_{{ $i }}">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
 
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="text" id="discount_percent_{{ $i }}"
-                                                name="discount_percent[]" onfocus="this.select();"
-                                                class="check_required form-control @error('title') is-invalid @enderror integerchk discount_percent_c"
-                                                value="{{ $value->discount_percent }}" placeholder="Discount">
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="text" id="discount_percent_{{ $i }}" name="discount_percent[]"
+                                        onfocus="this.select();"
+                                        class="check_required form-control @error('title') is-invalid @enderror integerchk discount_percent_c"
+                                        value="{{ $value->discount_percent }}" placeholder="Discount">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </td>
 
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="sub_total_{{ $i }}"
-                                                name="sub_total[]"
-                                                class="form-control @error('title') is-invalid @enderror sub_total_c"
-                                                value="{{ $value->sub_total }}" placeholder="Subtotal"
-                                                readonly="">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="cost_{{ $i }}" name="cost[]"
-                                                class="form-control @error('title') is-invalid @enderror cost_c"
-                                                value="{{ $value->total_cost }}" placeholder="Cost" readonly="">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="sub_total_{{ $i }}" name="sub_total[]"
+                                        class="form-control @error('title') is-invalid @enderror sub_total_c"
+                                        value="{{ $value->sub_total }}" placeholder="Subtotal" readonly="">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="cost_{{ $i }}" name="cost[]"
+                                        class="form-control @error('title') is-invalid @enderror cost_c"
+                                        value="{{ $value->total_cost }}" placeholder="Cost" readonly="">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
 
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="profit_{{ $i }}" name="profit[]"
-                                                class="form-control @error('title') is-invalid @enderror profit_c"
-                                                value="{{ $value->profit }}" placeholder="Profit" readonly="">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {!! Form::text('delivery_date_product[]', $value->delivery_date, [
-                                            'class' => 'form-control customDatepicker',
-                                            'placeholder' => 'Delivery Date',
-                                        ]) !!}
-                                    </td>
-                                    <td>
-                                        <select name="status[]" id="fstatus_id_{{ $i }}"
-                                            class="form-control @error('title') is-invalid @enderror fstatus_id select2">
-                                            <option value="none" {{ $value->status == 'none' ? 'selected' : '' }}>
-                                                @lang('index.none')
-                                            </option>
-                                            <option value="in_progress"
-                                                {{ $value->status == 'in_progress' ? 'selected' : '' }}>
-                                                @lang('index.in_progress')
-                                            </option>
-                                            <option value="done" {{ $value->status == 'done' ? 'selected' : '' }}>
-                                                @lang('index.done')
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="number" name="delivered_qty[]"
-                                            class="check_required form-control @error('title') is-invalid @enderror integerchk"
-                                            placeholder="@lang('index.delivered')" value="{{ $value->delivered_qty }}"
-                                            id="delivered_{{ $i }}">
-                                    </td>
-                                    <td class="ir_txt_center"><a class="btn btn-xs del_row dlt_button"><iconify-icon
-                                                icon="solar:trash-bin-minimalistic-broken"></iconify-icon></a></td>
-                                </tr>
-                            @endforeach
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="profit_{{ $i }}" name="profit[]"
+                                        class="form-control @error('title') is-invalid @enderror profit_c"
+                                        value="{{ $value->profit }}" placeholder="Profit" readonly="">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                {!! Form::text('delivery_date_product[]', $value->delivery_date, [
+                                'class' => 'form-control customDatepicker',
+                                'placeholder' => 'Delivery Date',
+                                ]) !!}
+                            </td>
+                            <td>
+                                <select name="status[]" id="fstatus_id_{{ $i }}"
+                                    class="form-control @error('title') is-invalid @enderror fstatus_id select2">
+                                    <option value="none" {{ $value->status == 'none' ? 'selected' : '' }}>
+                                        @lang('index.none')
+                                    </option>
+                                    <option value="in_progress" {{ $value->status == 'in_progress' ? 'selected' : '' }}>
+                                        @lang('index.in_progress')
+                                    </option>
+                                    <option value="done" {{ $value->status == 'done' ? 'selected' : '' }}>
+                                        @lang('index.done')
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="delivered_qty[]"
+                                    class="check_required form-control @error('title') is-invalid @enderror integerchk"
+                                    placeholder="@lang('index.delivered')" value="{{ $value->delivered_qty }}"
+                                    id="delivered_{{ $i }}">
+                            </td>
+                            <td class="ir_txt_center"><a class="btn btn-xs del_row dlt_button">
+                                    <iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon>
+                                </a></td>
+                        </tr>
+                        @endforeach
                         @endif
                     </tbody>
                     <tfoot>
@@ -285,75 +442,70 @@
                     <tbody class="add_order_inv">
                         <?php $i = 0; ?>
                         @if (isset($orderInvoice) && $orderInvoice)
-                            @foreach ($orderInvoice as $key => $value)
-                                <?php $i++; ?>
-                                <tr class="rowCount" data-id="{{ $value->id }}">
-                                    <td class="width_1_p ir_txt_center">{{ $i }}</td>
-                                    <td>
-                                        <select name="invoice_type[]" id="invoice_type_{{ $i }}"
-                                            class="form-control @error('title') is-invalid @enderror invoice_type select2">
-                                            <option value="Invoice"
-                                                {{ $value->invoice_type == 'Invoice' ? 'selected' : '' }}>
-                                                @lang('index.invoice')
-                                            </option>
-                                            <option value="Quotation"
-                                                {{ $value->invoice_type == 'Quotation' ? 'selected' : '' }}>
-                                                @lang('index.quotation')
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        {!! Form::text('invoice_date[]', $value->invoice_date, [
-                                            'class' => 'form-control customDatepicker',
-                                            'placeholder' => 'Invoice Date',
-                                        ]) !!}
-                                    </td>
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="invoice_amount_{{ $i }}"
-                                                name="invoice_amount[]"
-                                                class="form-control @error('title') is-invalid @enderror invoice_amount_c"
-                                                value="{{ $value->invoice_amount }}" placeholder="Amount">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="paid_amount_{{ $i }}"
-                                                name="invoice_paid[]"
-                                                class="form-control @error('title') is-invalid @enderror paid_amount_c"
-                                                value="{{ $value->paid_amount }}" placeholder="Paid">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="due_amount_{{ $i }}"
-                                                name="invoice_due[]"
-                                                class="form-control @error('title') is-invalid @enderror due_amount_c"
-                                                value="{{ $value->due_amount }}" placeholder="Due">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="input-group">
-                                            <input type="number" id="order_due_amount_{{ $i }}"
-                                                name="invoice_order_due[]"
-                                                class="form-control @error('title') is-invalid @enderror order_due_amount_c"
-                                                value="{{ $value->order_due_amount }}" placeholder="Order Due">
-                                            <span class="input-group-text"> {{ $setting->currency }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="ir_txt_center">
-                                        @if ($value->invoice_type !== 'Quotation' && $loop->index !== 0)
-                                            <a class="btn btn-xs del_inv_row dlt_button"><iconify-icon
-                                                    icon="solar:trash-bin-minimalistic-broken"></iconify-icon>
-                                            </a>
-                                        @endif
+                        @foreach ($orderInvoice as $key => $value)
+                        <?php $i++; ?>
+                        <tr class="rowCount" data-id="{{ $value->id }}">
+                            <td class="width_1_p ir_txt_center">{{ $i }}</td>
+                            <td>
+                                <select name="invoice_type[]" id="invoice_type_{{ $i }}"
+                                    class="form-control @error('title') is-invalid @enderror invoice_type select2">
+                                    <option value="Invoice" {{ $value->invoice_type == 'Invoice' ? 'selected' : '' }}>
+                                        @lang('index.invoice')
+                                    </option>
+                                    <option value="Quotation"
+                                        {{ $value->invoice_type == 'Quotation' ? 'selected' : '' }}>
+                                        @lang('index.quotation')
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                {!! Form::text('invoice_date[]', $value->invoice_date, [
+                                'class' => 'form-control customDatepicker',
+                                'placeholder' => 'Invoice Date',
+                                ]) !!}
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="invoice_amount_{{ $i }}" name="invoice_amount[]"
+                                        class="form-control @error('title') is-invalid @enderror invoice_amount_c"
+                                        value="{{ $value->invoice_amount }}" placeholder="Amount">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="paid_amount_{{ $i }}" name="invoice_paid[]"
+                                        class="form-control @error('title') is-invalid @enderror paid_amount_c"
+                                        value="{{ $value->paid_amount }}" placeholder="Paid">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="due_amount_{{ $i }}" name="invoice_due[]"
+                                        class="form-control @error('title') is-invalid @enderror due_amount_c"
+                                        value="{{ $value->due_amount }}" placeholder="Due">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <input type="number" id="order_due_amount_{{ $i }}" name="invoice_order_due[]"
+                                        class="form-control @error('title') is-invalid @enderror order_due_amount_c"
+                                        value="{{ $value->order_due_amount }}" placeholder="Order Due">
+                                    <span class="input-group-text"> {{ $setting->currency }}</span>
+                                </div>
+                            </td>
+                            <td class="ir_txt_center">
+                                @if ($value->invoice_type !== 'Quotation' && $loop->index !== 0)
+                                <a class="btn btn-xs del_inv_row dlt_button">
+                                    <iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon>
+                                </a>
+                                @endif
 
-                                    </td>
-                                </tr>
-                            @endforeach
+                            </td>
+                        </tr>
+                        @endforeach
                         @endif
                     </tbody>
                 </table>
@@ -385,59 +537,55 @@
                     <tbody class="add_deliveries">
                         <?php $i = 0; ?>
                         @if (isset($orderDeliveries) && $orderDeliveries)
-                            @foreach ($orderDeliveries as $key => $value)
-                                <?php $i++; ?>
-                                <tr class="rowCount" data-id="{{ $value->id }}">
-                                    <td class="width_1_p ir_txt_center">{{ $i }}</td>
-                                    <td>
-                                        <input type="hidden" name="delivaries_product[]"
-                                            value="{{ $value->product_id }}">
-                                        <input type="text" name="delivaries_product[]" onfocus="this.select();"
-                                            class="check_required form-control @error('title') is-invalid @enderror delivery_product_c"
-                                            placeholder="Product"
-                                            value="{{ getProductNameById($value->product_id) }}"
-                                            id="delivery_product_{{ $i }}" readonly>
-                                    </td>
-                                    <td>
-                                        <input type="number" name="delivaries_quantity[]" onfocus="this.select();"
-                                            class="check_required form-control @error('title') is-invalid @enderror integerchk delivery_quantity_c"
-                                            placeholder="Quantity" value="{{ $value->quantity }}"
-                                            id="delivery_quantity_{{ $i }}">
-                                    </td>
-                                    <td>
-                                        {!! Form::text('delivaries_date[]', $value->delivery_date, [
-                                            'class' => 'form-control customDatepicker',
-                                            'placeholder' => 'Delivery Date',
-                                        ]) !!}
-                                    </td>
-                                    <td>
-                                        <select name="delivaries_status[]" id="delivery_status_{{ $i }}"
-                                            class="form-control @error('title') is-invalid @enderror delivery_status select2">
-                                            <option value="none" {{ $value->status == 'none' ? 'selected' : '' }}>
-                                                @lang('index.none')
-                                            </option>
-                                            <option value="in_progress"
-                                                {{ $value->status == 'in_progress' ? 'selected' : '' }}>
-                                                @lang('index.in_progress')
-                                            </option>
-                                            <option value="done" {{ $value->status == 'done' ? 'selected' : '' }}>
-                                                @lang('index.done')
-                                            </option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="delivaries_note[]" onfocus="this.select();"
-                                            class="check_required form-control @error('title') is-invalid @enderror delivery_note_c"
-                                            placeholder="Note" value="{{ $value->delivery_note }}"
-                                            id="delivery_note_{{ $i }}">
-                                    </td>
-                                    <td class="ir_txt_center">
-                                        <a class="btn btn-xs del_del_row dlt_button"><iconify-icon
-                                                icon="solar:trash-bin-minimalistic-broken"></iconify-icon>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                        @foreach ($orderDeliveries as $key => $value)
+                        <?php $i++; ?>
+                        <tr class="rowCount" data-id="{{ $value->id }}">
+                            <td class="width_1_p ir_txt_center">{{ $i }}</td>
+                            <td>
+                                <input type="hidden" name="delivaries_product[]" value="{{ $value->product_id }}">
+                                <input type="text" name="delivaries_product[]" onfocus="this.select();"
+                                    class="check_required form-control @error('title') is-invalid @enderror delivery_product_c"
+                                    placeholder="Product" value="{{ getProductNameById($value->product_id) }}"
+                                    id="delivery_product_{{ $i }}" readonly>
+                            </td>
+                            <td>
+                                <input type="number" name="delivaries_quantity[]" onfocus="this.select();"
+                                    class="check_required form-control @error('title') is-invalid @enderror integerchk delivery_quantity_c"
+                                    placeholder="Quantity" value="{{ $value->quantity }}"
+                                    id="delivery_quantity_{{ $i }}">
+                            </td>
+                            <td>
+                                {!! Form::text('delivaries_date[]', $value->delivery_date, [
+                                'class' => 'form-control customDatepicker',
+                                'placeholder' => 'Delivery Date',
+                                ]) !!}
+                            </td>
+                            <td>
+                                <select name="delivaries_status[]" id="delivery_status_{{ $i }}"
+                                    class="form-control @error('title') is-invalid @enderror delivery_status select2">
+                                    <option value="none" {{ $value->status == 'none' ? 'selected' : '' }}>
+                                        @lang('index.none')
+                                    </option>
+                                    <option value="in_progress" {{ $value->status == 'in_progress' ? 'selected' : '' }}>
+                                        @lang('index.in_progress')
+                                    </option>
+                                    <option value="done" {{ $value->status == 'done' ? 'selected' : '' }}>
+                                        @lang('index.done')
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="delivaries_note[]" onfocus="this.select();"
+                                    class="check_required form-control @error('title') is-invalid @enderror delivery_note_c"
+                                    placeholder="Note" value="{{ $value->delivery_note }}" id="delivery_note_{{ $i }}">
+                            </td>
+                            <td class="ir_txt_center">
+                                <a class="btn btn-xs del_del_row dlt_button">
+                                    <iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon>
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
                         @endif
                     </tbody>
                 </table>
@@ -452,7 +600,8 @@
         <div class="col-sm-6 col-md-6 mb-2">
             <div class="form-group">
                 <label>@lang('index.quotation_note')</label>
-                <textarea name="quotation_note" id="quotation_note" class="form-control @error('title') is-invalid @enderror"
+                <textarea name="quotation_note" id="quotation_note"
+                    class="form-control @error('title') is-invalid @enderror"
                     placeholder="{{ __('index.quotation_note') }}" rows="3"></textarea>
             </div>
         </div>
@@ -460,7 +609,8 @@
         <div class="col-sm-6 col-md-6 mb-2">
             <div class="form-group">
                 <label>@lang('index.internal_note')</label>
-                <textarea name="internal_note" id="internal_note" class="form-control @error('title') is-invalid @enderror"
+                <textarea name="internal_note" id="internal_note"
+                    class="form-control @error('title') is-invalid @enderror"
                     placeholder="{{ __('index.internal_note') }}" rows="3"></textarea>
             </div>
         </div>
@@ -469,18 +619,19 @@
 
     <div class="row mt-2">
         <div class="col-sm-12 col-md-6 mb-2 d-flex gap-3">
-            <button type="submit" name="submit" value="submit"
-                class="btn bg-blue-btn order_submit_button"><iconify-icon
-                    icon="solar:check-circle-broken"></iconify-icon>@lang('index.submit')</button>
-            <a class="btn bg-second-btn" href="{{ route('customer-orders.index') }}"><iconify-icon
-                    icon="solar:round-arrow-left-broken"></iconify-icon>@lang('index.back')</a>
+            <button type="submit" name="submit" value="submit" class="btn bg-blue-btn order_submit_button">
+                <iconify-icon icon="solar:check-circle-broken"></iconify-icon>@lang('index.submit')
+            </button>
+            <a class="btn bg-second-btn" href="{{ route('customer-orders.index') }}">
+                <iconify-icon icon="solar:round-arrow-left-broken"></iconify-icon>@lang('index.back')
+            </a>
         </div>
     </div>
 </div>
 
 <select id="hidden_product" class="display_none">
     @foreach ($productList as $value)
-        <option value="{{ $value->id ?? '' }}">{{ $value->name ?? '' }}</option>
+    <option value="{{ $value->id ?? '' }}">{{ $value->name ?? '' }}</option>
     @endforeach
 </select>
 <input type="hidden" id="default_currency" value="{{ $setting->currency }}" />

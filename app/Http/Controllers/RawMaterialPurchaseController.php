@@ -1,19 +1,4 @@
 <?php
-/*
-  ##############################################################################
-  # iProduction - Production and Manufacture Management Software
-  ##############################################################################
-  # AUTHOR:		Door Soft
-  ##############################################################################
-  # EMAIL:		info@doorsoft.co
-  ##############################################################################
-  # COPYRIGHT:		RESERVED BY Door Soft
-  ##############################################################################
-  # WEBSITE:		https://www.doorsoft.co
-  ##############################################################################
-  # This is RawMaterialPurchaseController
-  ##############################################################################
- */
 
 namespace App\Http\Controllers;
 
@@ -38,6 +23,12 @@ class RawMaterialPurchaseController extends Controller
         $this->middleware('auth');
 
     }
+
+public function dashboard()
+{
+    return view('pages.purchase.dashboard');
+}
+     
     /**
      * Display a listing of the resource.
      *

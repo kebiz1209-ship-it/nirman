@@ -1,0 +1,11 @@
+{
+    "mail_driver": "smtp",
+    "mail_host": "*******",
+    "mail_port": "****",
+    "mail_encryption": "tls",
+    "mail_username": "********",
+    "mail_password": "********",
+    "mail_from": "no-reply@doorsoft.co",
+    "from_name": "iProduction",
+    "api_key": "********"
+}

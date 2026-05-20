@@ -1,0 +1,129 @@
+.backup-progress-container {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.backup-progress-bar {
+    height: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+    transition: width 0.3s ease;
+}
+
+.backup-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.backup-modal .table {
+    margin-bottom: 0;
+}
+
+.backup-modal .table th {
+    border-top: none;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.backup-filename {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #495057;
+}
+
+.backup-size {
+    font-weight: 600;
+    color: #28a745;
+}
+
+.backup-date {
+    color: #6c757d;
+}
+
+.backup-btn {
+    min-width: 35px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 3px;
+}
+
+.backup-btn:last-child {
+    margin-right: 0;
+}
+
+.backup-create-btn {
+    min-width: 120px;
+    font-weight: 600;
+}
+
+.backup-table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.backup-table-container .table-responsive {
+    border-radius: 0;
+}
+
+.backup-empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.backup-empty-state i {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.backup-info-cards {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.backup-info-card {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.backup-info-card h4 {
+    margin: 0 0 5px 0;
+    color: #495057;
+}
+
+.backup-info-card p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+@media (max-width: 768px) {
+    .backup-info-cards {
+        flex-direction: column;
+    }
+
+    .backup-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .backup-btn {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

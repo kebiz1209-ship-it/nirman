@@ -49,6 +49,12 @@ class SalesController extends Controller
     return view('pages.sales.sales', compact('title', 'obj', 'currencies'));
 }
 
+
+
+public function dashboard()
+{
+    return view('pages.sales.dashboard');
+}
     /**
      * Show the form for creating a new resource.
      *

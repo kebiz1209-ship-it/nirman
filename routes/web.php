@@ -9,6 +9,9 @@ use App\Http\Controllers\MenuActivityController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\RegionController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -234,6 +237,9 @@ Route::post('menu/activity/store', [MenuActivityController::class, 'store'])->na
             Route::get('/sale-returns/get-sale-items/{sale_id}', [App\Http\Controllers\SaleReturnController::class, 'getSaleItems'])->name('sale_returns.get_sale_items');
 
             // Customer Orders Controller
+
+            Route::get('/customer-order', [App\Http\Controllers\CustomerOrdersController::class, 'dashboard'])->name('customer_order.dashboard');
+
             Route::resource('customer-orders', App\Http\Controllers\CustomerOrdersController::class);
             Route::post('/storeUpdateInvoice', [App\Http\Controllers\CustomerOrdersController::class, 'storeUpdateInvoice'])->name('storeUpdateInvoice');
             Route::post('/storeUpdateDelivery', [App\Http\Controllers\CustomerOrdersController::class, 'storeUpdateDelivery'])->name('storeUpdateDelivery');
@@ -373,6 +379,16 @@ Route::post('menu/activity/store', [MenuActivityController::class, 'store'])->na
     ');
 });
 
+Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
+
+    session(['is_collapse' => $request->status]);
+
+    return response()->json([
+        'success' => true
+    ]);
+
+})->name('set-collapse');
+
             // Stock Controller
             Route::get('/getRMStock', [App\Http\Controllers\StockController::class, 'getRMStock'])->name('getRMStock');
             Route::post('/getRMStock', [App\Http\Controllers\StockController::class, 'getRMStock'])->name('getRMStock');
@@ -403,6 +419,50 @@ Route::post('menu/activity/store', [MenuActivityController::class, 'store'])->na
 
             // Finished Product Controller
             Route::get('product-price-history', [App\Http\Controllers\FinishedProductController::class, 'priceHistory'])->name('product.price.history');
+
+            //New kashish
+
+            Route::resource('regions', RegionController::class);
+            Route::resource('categories', CategoryController::class);
+            Route::resource('payments', PaymentController::class);
+
+
+
+            Route::get('/sales-dashboard', [App\Http\Controllers\SalesController::class, 'dashboard'])
+    ->name('sales.dashboard');
+
+Route::get('/purchase-dashboard', [App\Http\Controllers\RawMaterialPurchaseController::class, 'dashboard'])
+    ->name('purchase.dashboard');
+
+Route::get('/production-dashboard', [App\Http\Controllers\ProductionController::class, 'dashboard'])
+    ->name('production.dashboard');
+
+Route::get('/stock-dashboard', [App\Http\Controllers\StockController::class, 'dashboard'])
+    ->name('stock.dashboard');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         });
     });

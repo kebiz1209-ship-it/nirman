@@ -1,3 +1,12 @@
+<style>
+.disabled-menu {
+    /* pointer-events: none; */
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
+
+
 <div class="logo_Section_main_sidebar">
     <a href="{{ route('home') }}" class="logo-wrapper">
         @php
@@ -53,9 +62,381 @@
                 </a>
             </li>
             @endif
+            @if (menuPermission('Item Setup'))
+            <li
+                class="parent-menu treeview menu__cidirp_10{{ request()->is('rmcategories*') || request()->is('rawmaterials*') || request()->is('noninventoryitems*') || request()->is('fpcategories*') || request()->is('finishedproducts*') ? ' menu-open active_sub_menu' : '' }}">
+                <a href="#">
+                    <iconify-icon icon="solar:inbox-line-broken"></iconify-icon>
+                    <span class="match_bold">@lang('index.item_setup')</span>
+                </a>
+
+                <ul class="treeview-menu">
+                    @if (routePermission('rmcategory.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('rmcategories.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('rmcategories.create') }}">@lang('index.add_rm_category')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('rmcategory.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('rmcategories.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('rmcategories.index') }}">@lang('index.rm_category')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('rm.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('rawmaterials.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('rawmaterials.create') }}">@lang('index.add_raw_material')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('rm.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('rawmaterials.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('rawmaterials.index') }}">@lang('index.list_raw_material')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('noi.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('noninventoryitems.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('noninventoryitems.create') }}">@lang('index.add_non_inventory_item')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('noi.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('noninventoryitems.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('noninventoryitems.index') }}">@lang('index.list_non_inventory_item')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('productcategory.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('fpcategories.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('fpcategories.create') }}">@lang('index.add_product_category')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('productcategory.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('fpcategories.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('fpcategories.index') }}">@lang('index.list_product_category')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('product.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('finishedproducts.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('finishedproducts.create') }}">@lang('index.add_product')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('product.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('finishedproducts.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('finishedproducts.index') }}">@lang('index.list_product')</a>
+                    </li>
+                    @endif
+                </ul>
+            </li>
+            @endif
+            @if (menuPermission('Parties'))
+            <li
+                class="parent-menu treeview menu__cidirp_10{{ request()->is('suppliers*') || request()->is('customers*') ? ' menu-open active_sub_menu' : '' }}">
+                <a href="#">
+                    <iconify-icon icon="solar:users-group-two-rounded-broken"></iconify-icon>
+                    <span class="match_bold">@lang('index.parties')</span>
+                </a>
+
+                <ul class="treeview-menu">
+                    @if (routePermission('customer.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('customers.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('customers.create') }}">@lang('index.add_customer')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('customer.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('customers.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('customers.index') }}">@lang('index.list_customer')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('supplier.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('suppliers.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('suppliers.create') }}">@lang('index.add_supplier')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('supplier.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('suppliers.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('suppliers.index') }}">@lang('index.list_supplier')</a>
+                    </li>
+                    @endif
+                </ul>
+            </li>
+            @endif
+            @if (menuPermission('Orders'))
+
+            <li class="parent-menu treeview menu__cidirp_10
+    {{ request()->is('customer-orders*') || request()->is('customer-order-dashboard*')
+        ? ' menu-open active_sub_menu'
+        : '' }}" data-title="Orders">
+
+                <a href="#">
+                    <iconify-icon icon="solar:user-broken"></iconify-icon>
+
+                    <span class="match_bold">
+                        @lang('index.orders')
+                    </span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    {{-- DASHBOARD --}}
+                    @if (routePermission('customer_order.dashboard'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('customer_order.dashboard') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_10">
+
+                        <a href="{{ route('customer_order.dashboard') }}">
+                            Dashboard
+                        </a>
+
+                    </li>
+
+                    @endif
+
+
+                    {{-- ADD ORDER --}}
+                    @if (routePermission('order.create'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('customer-orders.create') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_10">
+
+                        <a href="{{ route('customer-orders.create') }}">
+                            @lang('index.add_order')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+
+                    {{-- ORDER LIST --}}
+                    @if (routePermission('order.index'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('customer-orders.index') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_10">
+
+                        <a href="{{ route('customer-orders.index') }}">
+                            @lang('index.order_list')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+
+                    {{-- ORDER STATUS --}}
+                    @if (routePermission('order-status'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('customer-order-status') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_10">
+
+                        <a href="{{ route('customer-order-status') }}">
+                            @lang('index.order_status')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                </ul>
+
+            </li>
+
+            @endif
+            @if (menuPermission('Purchase'))
+
+            <li class="parent-menu treeview menu__cidirp_9
+                {{ request()->is('rawmaterialpurchases*') || request()->is('purchase-dashboard*')
+                    ? ' menu-open active_sub_menu'
+                    : '' }}" data-title="Purchase">
+
+                <a href="#">
+                    <iconify-icon icon="solar:cart-check-broken"></iconify-icon>
+                    <span class="match_bold">@lang('index.purchase')</span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    {{-- PURCHASE DASHBOARD --}}
+                    @if (routePermission('purchase.dashboard'))
+
+                    <li class="menu_assign_class
+                            {{ request()->routeIs('purchase.dashboard') ? ' treeMenuActive' : '' }}">
+
+                        <a href="{{ route('purchase.dashboard') }}">
+                            Purchase Dashboard
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                    {{-- ADD PURCHASE --}}
+                    @if (routePermission('purchase.create'))
+
+                    <li class="menu_assign_class
+                            {{ request()->routeIs('rawmaterialpurchases.create') ? ' treeMenuActive' : '' }}">
+
+                        <a href="{{ route('rawmaterialpurchases.create') }}">
+                            @lang('index.add_purchase')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                    {{-- PURCHASE LIST --}}
+                    @if (routePermission('purchase.index'))
+
+                    <li class="menu_assign_class
+                            {{ request()->routeIs('rawmaterialpurchases.index') ? ' treeMenuActive' : '' }}">
+
+                        <a href="{{ route('rawmaterialpurchases.index') }}">
+                            @lang('index.list_purchase')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                </ul>
+
+            </li>
+
+            @endif
+
+            @if (menuPermission('Sales'))
+
+            <li class="parent-menu treeview menu__cidirp_8
+{{ request()->is('sales*') || request()->is('sale-dashboard*') || request()->is('sale-returns*')
+    ? ' menu-open active_sub_menu'
+    : '' }}" data-title="Sales">
+
+                <a href="#">
+                    <iconify-icon icon="solar:cart-large-broken"></iconify-icon>
+                    <span class="match_bold">@lang('index.sale')</span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    {{-- SALES DASHBOARD --}}
+                    @if (routePermission('sales.dashboard'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('sales.dashboard') ? ' treeMenuActive' : '' }}">
+
+                        <a href="{{ route('sales.dashboard') }}">
+                            Sales Dashboard
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                    {{-- ADD SALE --}}
+                    @if (routePermission('sale.create'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('sales.create') ? ' treeMenuActive' : '' }}">
+
+                        <a href="{{ route('sales.create') }}">
+                            @lang('index.add_sale')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                    {{-- SALE LIST --}}
+                    @if (routePermission('sale.index'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('sales.index') ? ' treeMenuActive' : '' }}">
+
+                        <a href="{{ route('sales.index') }}">
+                            @lang('index.sale_list')
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                </ul>
+
+            </li>
+
+            @endif
+
+            @if (menuPermission('RM Stock'))
+            <li class="parent-menu treeview menu_assign_class menu__cidirp_1{{ request()->is('getRMStock*') || request()->is('getLowStock*') || request()->is('stock-adjustment*') || request()->is('raw-material-transfers*') ? ' menu-open active_sub_menu' : '' }}"
+                data-menu__cid="irp_1">
+                <a href="#">
+                    <iconify-icon icon="solar:database-broken"></iconify-icon>
+                    <span class="match_bold">@lang('index.rm_stocks')</span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    {{-- STOCK DASHBOARD --}}
+                    @if (routePermission('stock.dashboard'))
+
+                    <li class="{{ request()->routeIs('stock.dashboard') ? 'treeMenuActive' : '' }}">
+
+                        <a href="{{ route('stock.dashboard') }}">
+                            Stock Dashboard
+                        </a>
+
+                    </li>
+
+                    @endif
+                    @if (routePermission('rm.stock'))
+                    <li class="menu_assign_class {{ request()->routeIs('getRMStock') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a href="{{ route('getRMStock') }}">@lang('index.rm_stocks')</a>
+                    </li>
+                    <li class="menu_assign_class {{ request()->routeIs('getLowStock') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a href="{{ route('getLowStock') }}">@lang('index.low_stock')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('stock-adjustment.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('stockAdjust') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('stockAdjust') }}">@lang('index.add_stock_adjustment')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('stock-adjustment.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('stockAdjustList') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('stockAdjustList') }}">@lang('index.stock_adjustment_list')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('stock-transfer.create'))
+                    <li class="menu_assign_class {{ request()->routeIs('raw-material-transfers.create') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('raw-material-transfers.create') }}">@lang('index.add_raw_material_transfer')</a>
+                    </li>
+                    @endif
+                    @if (routePermission('stock-transfer.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('raw-material-transfers.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('raw-material-transfers.index') }}">@lang('index.raw_material_transfer_list')</a>
+                    </li>
+                    @endif
+                </ul>
+            </li>
+            @endif
+
             @if (menuPermission('Production'))
             <li class="parent-menu treeview menu__cidirp_10 
-        {{ request()->is('productions*') || request()->is('production-loss*') ? 'menu-open active_sub_menu' : '' }}">
+                {{ request()->is('productions*') || request()->is('production-loss*') ? 'menu-open active_sub_menu' : '' }}"
+                data-title="Production">
 
                 <a href="#">
                     <iconify-icon icon="solar:chart-square-broken"></iconify-icon>
@@ -64,6 +445,20 @@
 
                 <ul class="treeview-menu">
 
+
+
+                    {{-- PRODUCTION DASHBOARD --}}
+                    @if (routePermission('production.dashboard'))
+
+                    <li class="{{ request()->routeIs('production.dashboard') ? 'treeMenuActive' : '' }}">
+
+                        <a href="{{ route('production.dashboard') }}">
+                            Production Dashboard
+                        </a>
+
+                    </li>
+
+                    @endif
                     {{-- Manufacture Create --}}
                     @if (routePermission('production.create'))
                     <li class="{{ request()->routeIs('productions.create') ? 'treeMenuActive' : '' }}">
@@ -130,193 +525,15 @@
                 </a>
             </li>
             @endif
-            @if (menuPermission('Orders'))
-            <li
-                class="parent-menu treeview menu__cidirp_10{{ request()->is('customer-orders*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
-                    <iconify-icon icon="solar:user-broken"></iconify-icon>
-                    <span class="match_bold">@lang('index.orders')</span>
-                </a>
 
-                <ul class="treeview-menu">
 
-                    @if (routePermission('order.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('customer-orders.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('customer-orders.create') }}">@lang('index.add_order')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('order.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('customer-orders.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('customer-orders.index') }}">@lang('index.order_list')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('order-status'))
-                    <li class="menu_assign_class {{ request()->routeIs('customer-order-status') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('customer-order-status') }}">@lang('index.order_status')</a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
-            @if (menuPermission('Sales'))
-            <li
-                class="parent-menu treeview menu__cidirp_10{{ request()->is('sales*') || request()->is('sale-returns*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
-                    <iconify-icon icon="solar:cart-large-broken"></iconify-icon>
-                    <span class="match_bold">@lang('index.sale')</span>
-                </a>
 
-                <ul class="treeview-menu">
 
-                    @if (routePermission('sale.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('sales.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a href="{{ route('sales.create') }}">@lang('index.add_sale')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('sale.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('sales.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a href="{{ route('sales.index') }}">@lang('index.sale_list')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('sale-return.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('sale-returns.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('sale-returns.create') }}">@lang('index.add_sale_return')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('sale-return.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('sale-returns.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('sale-returns.index') }}">@lang('index.sale_return_list')</a>
-                    </li>
-                    @endif
-
-                </ul>
-            </li>
-            @endif
-            @if (menuPermission('Purchase'))
-            <li
-                class="parent-menu treeview menu__cidirp_10{{ request()->is('rawmaterialpurchases*') || request()->is('purchasereturns*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
-                    <iconify-icon icon="solar:cart-check-broken"></iconify-icon>
-                    <span class="match_bold">@lang('index.purchase')</span>
-                </a>
-
-                <ul class="treeview-menu">
-                    @if (routePermission('purchase.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('rawmaterialpurchases.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('rawmaterialpurchases.create') }}">@lang('index.add_purchase')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('purchase.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('rawmaterialpurchases.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('rawmaterialpurchases.index') }}">@lang('index.list_purchase')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('purchase-return.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('purchasereturns.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('purchasereturns.create') }}">@lang('index.add_purchase_return')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('purchase-return.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('purchasereturns.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('purchasereturns.index') }}">@lang('index.list_purchase_return')</a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
-            @if (menuPermission('Parties'))
-            <li
-                class="parent-menu treeview menu__cidirp_10{{ request()->is('suppliers*') || request()->is('customers*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
-                    <iconify-icon icon="solar:users-group-two-rounded-broken"></iconify-icon>
-                    <span class="match_bold">@lang('index.parties')</span>
-                </a>
-
-                <ul class="treeview-menu">
-                    @if (routePermission('customer.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('customers.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('customers.create') }}">@lang('index.add_customer')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('customer.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('customers.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('customers.index') }}">@lang('index.list_customer')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('supplier.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('suppliers.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('suppliers.create') }}">@lang('index.add_supplier')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('supplier.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('suppliers.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('suppliers.index') }}">@lang('index.list_supplier')</a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
-            @if (menuPermission('RM Stock'))
-            <li class="parent-menu treeview menu_assign_class menu__cidirp_1{{ request()->is('getRMStock*') || request()->is('getLowStock*') || request()->is('stock-adjustment*') || request()->is('raw-material-transfers*') ? ' menu-open active_sub_menu' : '' }}"
-                data-menu__cid="irp_1">
-                <a href="#">
-                    <iconify-icon icon="solar:database-broken"></iconify-icon>
-                    <span class="match_bold">@lang('index.rm_stocks')</span>
-                </a>
-
-                <ul class="treeview-menu">
-                    @if (routePermission('rm.stock'))
-                    <li class="menu_assign_class {{ request()->routeIs('getRMStock') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a href="{{ route('getRMStock') }}">@lang('index.rm_stocks')</a>
-                    </li>
-                    <li class="menu_assign_class {{ request()->routeIs('getLowStock') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a href="{{ route('getLowStock') }}">@lang('index.low_stock')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('stock-adjustment.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('stockAdjust') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('stockAdjust') }}">@lang('index.add_stock_adjustment')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('stock-adjustment.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('stockAdjustList') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('stockAdjustList') }}">@lang('index.stock_adjustment_list')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('stock-transfer.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('raw-material-transfers.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('raw-material-transfers.create') }}">@lang('index.add_raw_material_transfer')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('stock-transfer.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('raw-material-transfers.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('raw-material-transfers.index') }}">@lang('index.raw_material_transfer_list')</a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
             @if (menuPermission('Attendance'))
             <li
                 class="parent-menu treeview menu__cidirp_10{{ request()->is('attendance*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
+                <!-- <a href="#"> -->
+                <a href="javascript:void(0)" class="disabled-menu">
                     <iconify-icon icon="solar:stopwatch-broken"></iconify-icon>
                     <span class="match_bold">@lang('index.attendance')</span>
                 </a>
@@ -340,7 +557,8 @@
             @if (menuPermission('Expenses'))
             <li
                 class="parent-menu treeview menu__cidirp_10{{ request()->is('expense') || request()->is('expense/*') || request()->is('expense-category*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
+                <!-- <a href="#"> -->
+                <a href="javascript:void(0)" class="disabled-menu">
                     <iconify-icon icon="solar:money-bag-broken"></iconify-icon>
                     <span class="match_bold">@lang('index.expense')</span>
                 </a>
@@ -374,7 +592,8 @@
             @if (menuPermission('Accounting'))
             <li
                 class="parent-menu treeview menu__cidirp_10{{ request()->is('accounts*') || request()->is('deposit*') || request()->is('balance-sheet*') || request()->is('trial-balance*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
+                <!-- <a href="#"> -->
+                <a href="javascript:void(0)" class="disabled-menu">
                     <iconify-icon icon="solar:wallet-money-broken"></iconify-icon>
                     <span class="match_bold">@lang('index.accounting')</span>
                 </a>
@@ -466,7 +685,8 @@
             @if (menuPermission('Payroll'))
             <li
                 class="parent-menu treeview menu__cidirp_10{{ request()->is('payroll*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
+                <!-- <a href="#"> -->
+                <a href="javascript:void(0)" class="disabled-menu">
                     <iconify-icon icon="solar:transmission-broken"></iconify-icon>
                     <span class="match_bold">@lang('index.payroll')</span>
                 </a>
@@ -485,78 +705,7 @@
                 </ul>
             </li>
             @endif
-            @if (menuPermission('Item Setup'))
-            <li
-                class="parent-menu treeview menu__cidirp_10{{ request()->is('rmcategories*') || request()->is('rawmaterials*') || request()->is('noninventoryitems*') || request()->is('fpcategories*') || request()->is('finishedproducts*') ? ' menu-open active_sub_menu' : '' }}">
-                <a href="#">
-                    <iconify-icon icon="solar:inbox-line-broken"></iconify-icon>
-                    <span class="match_bold">@lang('index.item_setup')</span>
-                </a>
 
-                <ul class="treeview-menu">
-                    @if (routePermission('rmcategory.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('rmcategories.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('rmcategories.create') }}">@lang('index.add_rm_category')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('rmcategory.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('rmcategories.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('rmcategories.index') }}">@lang('index.rm_category')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('rm.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('rawmaterials.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('rawmaterials.create') }}">@lang('index.add_raw_material')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('rm.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('rawmaterials.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('rawmaterials.index') }}">@lang('index.list_raw_material')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('noi.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('noninventoryitems.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('noninventoryitems.create') }}">@lang('index.add_non_inventory_item')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('noi.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('noninventoryitems.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('noninventoryitems.index') }}">@lang('index.list_non_inventory_item')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('productcategory.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('fpcategories.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('fpcategories.create') }}">@lang('index.add_product_category')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('productcategory.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('fpcategories.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('fpcategories.index') }}">@lang('index.list_product_category')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('product.create'))
-                    <li class="menu_assign_class {{ request()->routeIs('finishedproducts.create') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('finishedproducts.create') }}">@lang('index.add_product')</a>
-                    </li>
-                    @endif
-                    @if (routePermission('product.index'))
-                    <li class="menu_assign_class {{ request()->routeIs('finishedproducts.index') ? ' treeMenuActive' : '' }}"
-                        data-menu__cid="irp_10"><a
-                            href="{{ route('finishedproducts.index') }}">@lang('index.list_product')</a>
-                    </li>
-                    @endif
-                </ul>
-            </li>
-            @endif
             @if (menuPermission('RM Wastes'))
             <li
                 class="parent-menu treeview menu__cidirp_10{{ request()->is('rmwastes*') ? ' menu-open active_sub_menu' : '' }}">
@@ -877,15 +1026,163 @@
             @endif
 
 
-           
-           
+            @if (menuPermission('Region'))
 
-            <div class="ps__rail-x">
-                <div class="ps__thumb-x" tabindex="0"></div>
-            </div>
-            <div class="ps__rail-y">
-                <div class="ps__thumb-y" tabindex="0"></div>
-            </div>
+            <li class="parent-menu treeview menu__cidirp_26
+    {{ request()->is('regions*') ? ' menu-open active_sub_menu' : '' }}">
+
+                <a href="#">
+                    <iconify-icon icon="solar:map-point-wave-broken"></iconify-icon>
+
+                    <span class="match_bold">
+                        Region
+                    </span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    @if (routePermission('regions.create'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('regions.create') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_26">
+
+                        <a href="{{ route('regions.create') }}">
+                            Add Region
+                        </a>
+
+                    </li>
+
+                    @endif
+
+
+                    @if (routePermission('regions.index'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('regions.index') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_26">
+
+                        <a href="{{ route('regions.index') }}">
+                            List Region
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                </ul>
+
+            </li>
+
+            @endif
+
+
+            @if (menuPermission('Category'))
+
+            <li class="parent-menu treeview menu__cidirp_27
+    {{ request()->is('categories*') ? ' menu-open active_sub_menu' : '' }}">
+
+                <a href="#">
+                    <iconify-icon icon="solar:layers-minimalistic-broken"></iconify-icon>
+
+                    <span class="match_bold">
+                        Category
+                    </span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    @if (routePermission('categories.create'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('categories.create') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_27">
+
+                        <a href="{{ route('categories.create') }}">
+                            Add Category
+                        </a>
+
+                    </li>
+
+                    @endif
+
+
+                    @if (routePermission('categories.index'))
+
+                    <li class="menu_assign_class
+                        {{ request()->routeIs('categories.index') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_27">
+
+                        <a href="{{ route('categories.index') }}">
+                            List Category
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                </ul>
+
+
+                @if (menuPermission('Payment'))
+
+            <li class="parent-menu treeview menu__cidirp_28
+                {{ request()->is('payments*') ? ' menu-open active_sub_menu' : '' }}">
+
+                <a href="#">
+                    <iconify-icon icon="solar:wallet-money-broken"></iconify-icon>
+
+                    <span class="match_bold">
+                        Payment
+                    </span>
+                </a>
+
+                <ul class="treeview-menu">
+
+                    @if (routePermission('payments.create'))
+
+                    <li class="menu_assign_class
+                        {{ request()->routeIs('payments.create') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_28">
+
+                        <a href="{{ route('payments.create') }}">
+                            Add Payment
+                        </a>
+
+                    </li>
+
+                    @endif
+
+
+                    @if (routePermission('payments.index'))
+
+                    <li class="menu_assign_class
+            {{ request()->routeIs('payments.index') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_28">
+
+                        <a href="{{ route('payments.index') }}">
+                            List Payment
+                        </a>
+
+                    </li>
+
+                    @endif
+
+                </ul>
+
+            </li>
+
+            @endif
+
+
+        </ul>
+
+        </li>
+
+        @endif
+
+
+
+        <div class="ps__rail-x">
+            <div class="ps__thumb-x" tabindex="0"></div>
+        </div>
+        <div class="ps__rail-y">
+            <div class="ps__thumb-y" tabindex="0"></div>
+        </div>
         </ul>
     </div>
 </section>

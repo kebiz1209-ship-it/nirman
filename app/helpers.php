@@ -1593,19 +1593,48 @@ if (!function_exists('encrypt_decrypt')) {
  * Function escape output
  * @returns string
  */
+// if (!function_exists('escape_output')) {
+//     function escape_output($string)
+//     {
+//         if ($string) {
+//             $output = htmlentities($string, ENT_QUOTES, 'UTF-8');
+//             $output = str_replace("&amp;", "&", $output);
+//             return $output;
+//         } else {
+//             return '';
+//         }
+//     }
+// }
+
+
 if (!function_exists('escape_output')) {
+
     function escape_output($string)
     {
-        if ($string) {
-            $output = htmlentities($string, ENT_QUOTES, 'UTF-8');
-            $output = str_replace("&amp;", "&", $output);
-            return $output;
-        } else {
-            return '';
+        if (is_array($string)) {
+
+            return array_map(function ($item) {
+                return is_array($item)
+                    ? escape_output($item)
+                    : str_replace(
+                        "&amp;",
+                        "&",
+                        htmlentities((string) $item, ENT_QUOTES, 'UTF-8')
+                    );
+            }, $string);
         }
+
+        if ($string !== null && $string !== '') {
+
+            $output = htmlentities((string) $string, ENT_QUOTES, 'UTF-8');
+            $output = str_replace("&amp;", "&", $output);
+
+            return $output;
+        }
+
+        return '';
     }
 }
-
 /**
  * convert raw material unit to purchase unit
  */

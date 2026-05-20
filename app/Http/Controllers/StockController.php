@@ -123,6 +123,12 @@ class StockController extends Controller
      * Display Stock Adjust List
      */
 
+
+
+    public function dashboard()
+{
+    return view('pages.stock.dashboard');
+}
     public function stockAdjust()
     {
         $title = __('index.stock_adjustment');

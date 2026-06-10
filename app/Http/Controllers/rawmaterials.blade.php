@@ -10,33 +10,18 @@
     ?>
     <section class="main-content-wrapper">
         @include('utilities.messages')
-       <section class="content-header">
-    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <section class="content-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="top-left-header">{{ isset($title) && $title ? $title : '' }}</h2>
+                    <input type="hidden" class="datatable_name" data-title="{{ isset($title) && $title ? $title : '' }}"
+                        data-id_name="datatable">
+                </div>
+                <div class="col-md-offset-4 col-md-2">
 
-        <!-- Left Side Title -->
-        <div>
-            <h2 class="top-left-header">
-                {{ isset($title) && $title ? $title : '' }}
-            </h2>
-
-            <input type="hidden"
-                class="datatable_name"
-                data-title="{{ isset($title) && $title ? $title : '' }}"
-                data-id_name="datatable">
-        </div>
-
-        <!-- Right Side Button -->
-        <div>
-            @if (routePermission('rm.create'))
-                <a href="{{ route('rawmaterials.create') }}"
-                   class="btn btn-primary {{ request()->routeIs('rawmaterials.create') ? 'active' : '' }}">
-                    <i class="fa fa-plus"></i> @lang('index.add_raw_material')
-                </a>
-            @endif
-        </div>
-
-    </div>
-</section>
+                </div>
+            </div>
+        </section>
 
 
         <div class="box-wrapper">
@@ -68,7 +53,7 @@
                             @endif
                             @foreach ($obj as $value)
                                 <tr>
-                                    <td class="c_center">{{ $loop->iteration }}</td>
+                                    <td class="c_center">{{ $i-- }}</td>
                                     <td>{{ $value->name }}</td>
                                     <td>{{ $value->code }}</td>
                                     <td>{{ getCategoryById($value->category) }}</td>

@@ -227,6 +227,123 @@ $(document).ready(function () {
             "X-CSRF-TOKEN": jQuery(`meta[name="csrf-token"]`).attr("content"),
         },
     });
+    function loadFinishedProductData() {
+        let hidden_base_url = $("#hidden_base_url").val();
+        let hidden_currency = $("#hidden_currency").val();
+        let product_quantity = $(".product_quantity").val();
+        // Try select or input with id first, then class, then hidden input
+        let params = $("#fproduct_id").length ? $("#fproduct_id").val() : $(".fproduct_id").length ? $(".fproduct_id").val() : null;
+        // If params doesn't contain id (no pipe), try hidden input named product_id (used in readonly mode)
+        if ((!params || params.toString().indexOf("|") === -1) && $("input[name='product_id']").length) {
+            let hiddenProduct = $("input[name='product_id']").val();
+            if (hiddenProduct) params = hiddenProduct;
+        }
+        if (!product_quantity || !params) {
+            return;
+        }
+        let separate_params = params.toString().split("|");
+        let fproduct_id = separate_params[0];
+        $(".hidden_sec").removeClass("hidden_sec");
+        $.ajax({
+            type: "POST",
+            url: hidden_base_url + "getFinishProductRManufacture",
+            data: { id: fproduct_id, value: product_quantity },
+            dataType: "json",
+            success: function (response) {
+                if (response.status && response.data) {
+                    let html = '';
+                    let rowCount = 1;
+                    response.data.forEach(function(item) {
+                        html += '<tr class="rowCount" data-id="' + item.raw_material_id + '">' +
+                            '<td class="width_1_p text-start"><p class="set_sn"></p></td>' +
+                            '<td><input type="hidden" value="' + item.raw_material_id + '" name="rm_id[]">' +
+                            '<span>' + item.rm_name + '</span></td>' +
+                            '<td><div class="input-group">' +
+                            '<input type="number" tabindex="5" name="unit_price[]" onfocus="this.select();" ' +
+                            'class="check_required form-control integerchk unit_price_c cal_row" ' +
+                            'placeholder="Unit Price" value="' + item.unit_price + '" ' +
+                            'id="unit_price_' + rowCount + '">' +
+                            '<span class="input-group-text">' + hidden_currency + '</span></div></td>' +
+                            '<td><div class="input-group">' +
+                            '<input type="number" data-countid="' + rowCount + '" tabindex="51" id="qty_' + rowCount + '" ' +
+                            'name="quantity_amount[]" onfocus="this.select();" ' +
+                            'class="check_required form-control integerchk qty_c cal_row" ' +
+                            'value="' + item.consumption + '" placeholder="Consumption">' +
+                            '<span class="input-group-text">' + (item.unit || '') + '</span></div></td>' +
+                            '<td><div class="input-group">' +
+                            '<input type="number" id="total_' + rowCount + '" name="total[]" ' +
+                            'class="form-control total_c" value="' + item.total_cost + '" placeholder="Total" readonly>' +
+                            '<span class="input-group-text">' + hidden_currency + '</span></div></td>' +
+                            '<td class="text-end"><a class="btn btn-xs del_row dlt_button">' +
+                            '<iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon></a></td>' +
+                            '</tr>';
+                        rowCount++;
+                    });
+                    $(".add_trm").html(html);
+                }
+                setAttribute();
+                cal_row();
+                rawMaterialStockCheck(product_quantity, fproduct_id);
+            },
+            error: function () {},
+        });
+        $.ajax({
+            type: "POST",
+            url: hidden_base_url + "getFinishProductNONI",
+            data: { id: fproduct_id, value: product_quantity },
+            dataType: "json",
+            success: function (response) {
+                if (response.status && response.data) {
+                    let html = '';
+                    let rowCount = 1;
+                    response.data.forEach(function(item) {
+                        html += '<tr class="rowCount1" data-id="' + item.noninventory_item_id + '">' +
+                            '<td class="width_1_p text-start"><p class="set_sn1"></p></td>' +
+                            '<td><input type="hidden" value="' + item.noninventory_item_id + '" name="noniitem_id[]">' +
+                            '<span>' + item.noni_name + '</span></td>' +
+                            '<td></td>' +
+                            '<td><div class="input-group">' +
+                            '<input type="number" id="total_1" name="total_1[]" ' +
+                            'class="cal_row form-control aligning total_c1" onfocus="select();" ' +
+                            'value="' + item.cost + '" placeholder="Total">' +
+                            '<span class="input-group-text">' + hidden_currency + '</span></div></td>' +
+                            '<td width="20%"><select class="form-control account_id_c1" name="account_id[]">' +
+                            '<option value="">Select</option></select></td>' +
+                            '<td class="text-end"><a class="btn btn-xs del_row dlt_button">' +
+                            '<iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon></a></td>' +
+                            '</tr>';
+                        rowCount++;
+                    });
+                    $(".add_tnoni").html(html);
+                }
+                setAttribute();
+                cal_row();
+                $(".select2").select2();
+                $("#productionstage_id").select2({
+                    dropdownParent: $("#productScheduling"),
+                });
+            },
+            error: function () {},
+        });
+        $.ajax({
+            type: "POST",
+            url: hidden_base_url + "getFinishProductStages",
+            data: { id: fproduct_id, value: product_quantity },
+            dataType: "json",
+            success: function (data) {
+                $(".add_tstage").html(data.html);
+                $("#t_month").val(data.total_month);
+                $("#t_day").val(data.total_day);
+                $("#t_hours").val(data.total_hour);
+                $("#t_minute").val(data.total_minute);
+                setAttribute();
+                cal_row();
+                checkBoxSingle();
+            },
+            error: function () {},
+        });
+    }
+
     $(document).on("click", "#pr_go", function (e) {
         e.preventDefault();
         $(".submit_btn").removeClass("disabled");
@@ -243,58 +360,14 @@ $(document).ready(function () {
                 confirmButtonColor: "#3c8dbc",
             });
         } else {
-            let hidden_base_url = $("#hidden_base_url").val();
-            let product_quantity = $(".product_quantity").val();
-            let params = $(".fproduct_id").val();
-            let separate_params = params.split("|");
-            let fproduct_id = separate_params[0];
-            $(".hidden_sec").removeClass("hidden_sec");
-            $.ajax({
-                type: "POST",
-                url: hidden_base_url + "getFinishProductRManufacture",
-                data: { id: fproduct_id, value: product_quantity },
-                dataType: "json",
-                success: function (data) {
-                    $(".add_trm").html(data);
-                    setAttribute();
-                    cal_row();
-                    rawMaterialStockCheck(product_quantity, fproduct_id);
-                },
-                error: function () {},
-            });
-            $.ajax({
-                type: "POST",
-                url: hidden_base_url + "getFinishProductNONI",
-                data: { id: fproduct_id, value: product_quantity },
-                dataType: "json",
-                success: function (data) {
-                    $(".add_tnoni").html(data);
-                    setAttribute();
-                    cal_row();
-                    $(".select2").select2();
-                    $("#productionstage_id").select2({
-                        dropdownParent: $("#productScheduling"),
-                    });
-                },
-                error: function () {},
-            });
-            $.ajax({
-                type: "POST",
-                url: hidden_base_url + "getFinishProductStages",
-                data: { id: fproduct_id, value: product_quantity },
-                dataType: "json",
-                success: function (data) {
-                    $(".add_tstage").html(data.html);
-                    $("#t_month").val(data.total_month);
-                    $("#t_day").val(data.total_day);
-                    $("#t_hours").val(data.total_hour);
-                    $("#t_minute").val(data.total_minute);
-                    setAttribute();
-                    cal_row();
-                    checkBoxSingle();
-                },
-                error: function () {},
-            });
+            loadFinishedProductData();
+        }
+    });
+
+    // Trigger load when product or quantity changes (handle select and readonly input)
+    $(document).on("change", "#fproduct_id, .fproduct_id, #product_quantity", function () {
+        if (Number($("#product_quantity").val()) && ($("#fproduct_id").val() || $(".fproduct_id").val() || $("input[name='product_id']").val())) {
+            loadFinishedProductData();
         }
     });
     /**
@@ -428,6 +501,7 @@ $(document).ready(function () {
 
     $(document).on("click", "#fprmaterial", function (e) {
         ++i;
+        let hidden_currency = $("#hidden_currency").val() || "";
         let ram_hidden = $("#ram_hidden").html();
         console.log(ram_hidden);
         $(".add_trm").append(
@@ -436,9 +510,9 @@ $(document).ready(function () {
                 '<td><input type="hidden" class="rm_id" /><select class="form-control rmaterials_id" name="rm_id[]">\n' +
                 ram_hidden +
                 "</select></td>" +
-                '<td><div class="input-group"><input type="text" tabindex="5" name="unit_price[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning unit_price_c cal_row pfrmup" placeholder="Unit Price" value="" id="unit_price_1"><span class="input-group-text rmcurrency">$</span></div></td>' +
+                '<td><div class="input-group"><input type="text" tabindex="5" name="unit_price[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning unit_price_c cal_row pfrmup" placeholder="Unit Price" value="" id="unit_price_1"><span class="input-group-text rmcurrency">' + hidden_currency + '</span></div></td>' +
                 '<td><div class="input-group"><input type="text" data-countid="1" tabindex="51" id="qty_1" name="quantity_amount[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning qty_c cal_row" value="" placeholder="Consumption"><span class="input-group-text rmhunit">Piece</span></div></td>' +
-                '<td><div class="input-group"><input type="text" id="total_1" name="total[]" class="form-control input_aligning total_c" value="" placeholder="Total" readonly=""><span class="input-group-text rmcurrency">$</span></div></td>' +
+                '<td><div class="input-group"><input type="text" id="total_1" name="total[]" class="form-control input_aligning total_c" value="" placeholder="Total" readonly=""><span class="input-group-text rmcurrency">' + hidden_currency + '</span></div></td>' +
                 '<td class="text-end"><a class="btn btn-xs del_row remove-tr dlt_button"><iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon></a></td>' +
                 "</tr>"
         );
@@ -464,6 +538,7 @@ $(document).ready(function () {
     i = 0;
     $(document).on("click", "#fpnonitem", function (e) {
         ++i;
+        let hidden_currency = $("#hidden_currency").val() || "";
         let noni_hidden = $("#noni_hidden").html();
         let account_hidden = $("#account_hidden").html();
         $(".add_tnoni").append(
@@ -472,7 +547,7 @@ $(document).ready(function () {
                 '<td><select class="form-control noninvemtory_id" name="noniitem_id[]" id="noninvemtory_id">\n' +
                 noni_hidden +
                 "</select></td><td></td>" +
-                '<td><div class="input-group"><input type="text" id="total_1" name="total_1[]" class="cal_row check_required  form-control aligning total_c1" onfocus="select();" value="" placeholder="Non Inventory Cost"><span class="input-group-text nicurrency">$</span></div></td>' +
+                '<td><div class="input-group"><input type="text" id="total_1" name="total_1[]" class="cal_row check_required  form-control aligning total_c1" onfocus="select();" value="" placeholder="Non Inventory Cost"><span class="input-group-text nicurrency">' + hidden_currency + '</span></div></td>' +
                 '<td><div><select class="form-control account_id_c1" name="account_id[]" id="account_id">\n' +
                 account_hidden +
                 "</select></td></div>" +

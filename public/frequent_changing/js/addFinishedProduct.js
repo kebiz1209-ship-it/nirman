@@ -1,7 +1,7 @@
 $(document).ready(function () {
     "use strict";
     let hidden_currency = $("#hidden_currency").val();
-    let tax_type = $(".tax_type").val();
+    let tax_type = $(".tax_type:first").val();
     let target = $(".sort_menu");
     target.sortable({
         handle: ".handle",
@@ -45,20 +45,32 @@ $(document).ready(function () {
             i++;
         });
         i = 1;
-        $(".unit_price_c").each(function () {
-            $(this).attr("id", "unit_price_" + i);
-            i++;
-        });
-        i = 1;
-        $(".qty_c").each(function () {
-            $(this).attr("id", "qty_" + i);
-            i++;
-        });
-        i = 1;
-        $(".total_c").each(function () {
-            $(this).attr("id", "total_" + i);
-            i++;
-        });
+        // $(".unit_price_c").each(function () {
+        //     $(this).attr("id", "unit_price_" + i);
+        //     i++;
+        // });
+        // i = 1;
+        // $(".qty_c").each(function () {
+        //     $(this).attr("id", "qty_" + i);
+        //     i++;
+        // });
+        // i = 1;
+        // $(".total_c").each(function () {
+        //     $(this).attr("id", "total_" + i);
+        //     i++;
+        // });
+
+        $(".set_sn").each(function (i) {
+    $(this).html(i + 1);
+});
+
+$(".set_sn1").each(function (i) {
+    $(this).html(i + 1);
+});
+
+$(".set_sn2").each(function (i) {
+    $(this).html(i + 1);
+});
         i = 1;
         $(".total_c1").each(function () {
             $(this).attr("id", "total_c" + i);
@@ -87,14 +99,24 @@ $(document).ready(function () {
         let noniitem = 0;
         let total_percentage = 0;
         let profit_total = 0;
-        $(".unit_price_c").each(function () {
-            let unit_price = Number($("#unit_price_" + i).val());
-            let qty = Number($("#qty_" + i).val());
-            row_tatal = unit_price * qty;
-            row_tatal_total += row_tatal;
-            $("#total_" + i).val(row_tatal.toFixed(2));
-            i++;
-        });
+        // $(".unit_price_c").each(function () {
+        //     let unit_price = Number($("#unit_price_" + i).val());
+        //     let qty = Number($("#qty_" + i).val());
+        //     row_tatal = unit_price * qty;
+        //     row_tatal_total += row_tatal;
+        //     $("#total_" + i).val(row_tatal.toFixed(2));
+        //     i++;
+        // });
+
+        $(".rowCount").each(function () {
+    let unit_price = Number($(this).find(".unit_price_c").val());
+    let qty = Number($(this).find(".qty_c").val());
+
+    let row_total = unit_price * qty;
+    row_tatal_total += row_total;
+
+    $(this).find(".total_c").val(row_total.toFixed(2));
+});
 
         if (tax_type == "Exclusive") {
             $(".get_percentage").each(function () {
@@ -105,21 +127,29 @@ $(document).ready(function () {
 
         i = 1;
 
+        // $(".total_c1").each(function () {
+        //     let total = Number($("#total_c" + i).val());
+        //     noniitem += total;
+        //     i++;
+        // });
         $(".total_c1").each(function () {
-            let total = Number($("#total_c" + i).val());
-            noniitem += total;
-            i++;
-        });
-        
+    let total = Number($(this).val());
+    noniitem += total;
+});
+
         $("#rmcost_total").val(row_tatal_total.toFixed(2));
         $("#noninitem_total").val(noniitem.toFixed(2));
         $("#total_cost").val((noniitem + row_tatal_total).toFixed(2));
 
-        $(".margin_cal").each(function () {
-            let profit_margin = Number($(".profit_margin").val());
-            let total_cos = Number($("#total_cost").val());
-            profit_total = (total_cos * profit_margin) / 100;
-        });
+        // $(".margin_cal").each(function () {
+        //     let profit_margin = Number($(".profit_margin").val());
+        //     let total_cos = Number($("#total_cost").val());
+        //     profit_total = (total_cos * profit_margin) / 100;
+        // });
+
+        let profit_margin = Number($(".profit_margin").val());
+let total_cos = Number($("#total_cost").val());
+let profit_total = (total_cos * profit_margin) / 100;
         let getActual_sale_price = calPercentage(
             noniitem + row_tatal_total + profit_total,
             total_percentage
@@ -168,7 +198,7 @@ $(document).ready(function () {
 
         $(".rowCount").each(function () {
             let id = $(this).attr("data-id");
-            if (Number(id) == Number(separate_params[0])) {
+            if (String(id) === String(separate_params[0])) {
                 check_exist = false;
             }
         });
@@ -177,7 +207,7 @@ $(document).ready(function () {
             if (separate_params[0]) {
                 //if errorMsg is exist then remove
                 $(".rawmaterialsec tbody").find(".errorMsg").remove();
-                $(".add_tr").append(html);
+                $(".rawmaterialsec tbody").append(html);
                 setAttribute();
                 cal_row();
                 $("#rmaterial").val("").change();
@@ -194,7 +224,7 @@ $(document).ready(function () {
                 confirmButtonText: hidden_ok,
                 confirmButtonColor: "#3c8dbc",
             });
-            $("#rmaterial").val("").change();
+            $("#noniitem").val("").change();
             return false;
         }
     });
@@ -453,7 +483,7 @@ $(document).ready(function () {
     
 
     $(document).on("click", ".del_row", function (e) {
-        $(this).parent().parent().remove();
+        $(this).closest("tr").remove();
         setAttribute();
         cal_row();
     });
@@ -479,112 +509,66 @@ $(document).ready(function () {
     });
 
     $("#product_form").submit(function () {
-        let status = true;
-        //get name name field data
-        let name = $("#name").val();
-        let code = $("#code").val();
-        let category = $("#category_id").val();
-        let unit = $("#unit_id").val();
-        let stockMethod = $("#stocks").val();
-        let qty_c = $(".qty_c").val();
 
-        if(name == "") {
+    let status = true;
+
+    let name = $("#name").val();
+    let code = $("#code").val();
+    let category = $("#category_id").val();
+    let unit = $("#unit_id").val();
+    let stockMethod = $("#stocks").val();
+
+    if(name == "") {
+        status = false;
+        showErrorMessage("name", "The Name field is required");
+    }
+
+    if(code == "") {
+        status = false;
+        showErrorMessage("code", "The Code field is required");
+    }
+
+    if(category == "") {
+        status = false;
+        showErrorMessage("category_id", "The Category field is required");
+    }
+
+    if(unit == "") {
+        status = false;
+        showErrorMessage("unit_id", "The Unit field is required");
+    }
+
+    if(stockMethod == "") {
+        status = false;
+        showErrorMessage("stocks", "The Stock Method field is required");
+    }
+
+    // OPTIONAL RAW MATERIAL VALIDATION
+    $(".rowCount").each(function () {
+
+        let unit_price = $(this).find(".unit_price_c").val();
+        let qty = $(this).find(".qty_c").val();
+
+        let unitErr = $(this).find(".unitPriceErr");
+        let qtyErr = $(this).find(".qtyErr");
+
+        if(unit_price == "") {
             status = false;
-            showErrorMessage("name", "The Name field is required");
-        }else{
-            $("#name").removeClass("is-invalid");
-            $("#name").closest("div").find(".text-danger").addClass("d-none");
+            unitErr.removeClass("d-none").text("Unit Price required");
+        } else {
+            unitErr.addClass("d-none");
         }
 
-        if(code == "") {
+        if(qty == "" || qty <= 0) {
             status = false;
-            showErrorMessage("code", "The Code field is required");
-        }else{
-            $("#code").removeClass("is-invalid");
-            $("#code").closest("div").find(".text-danger").addClass("d-none");
-        }
-
-        if(category == "") {
-            status = false;
-            showErrorMessage("category_id", "The Category field is required");
-        }else{
-            $("#category_id").removeClass("is-invalid");
-            $("#category_id").closest("div").find(".text-danger").addClass("d-none");
-        }
-
-        if(unit == "") {
-            status = false;
-            showErrorMessage("unit_id", "The Unit field is required");
-        }else{
-            $("#unit_id").removeClass("is-invalid");
-            $("#unit_id").closest("div").find(".text-danger").addClass("d-none");
-        }
-
-        if(stockMethod == "") {
-            status = false;
-            showErrorMessage("stocks", "The Stock Method field is required");
-        }else{
-            $("#stocks").removeClass("is-invalid");
-            $("#stocks").closest("div").find(".text-danger").addClass("d-none");
-        }
-
-        $(".unit_price_c").each(function () {
-            let unit_price_c = $(this).val();
-            let closestDiv = $(this).parent().next(".unitPriceErr");
-
-            if (unit_price_c == "") {
-                status = false;
-                $(this).addClass("is-invalid");
-                closestDiv.text("The Unit Price field is required");
-                closestDiv.removeClass("d-none");
-            } else {
-                $(this).removeClass("is-invalid");
-                closestDiv.addClass("d-none");
-            }
-        });
-
-        $(".qty_c").each(function () {
-            let qty_c = $(this).val();
-            let closestDiv = $(this).parent().next(".qtyErr");
-
-            if (qty_c == "") {
-                status = false;
-                $(this).addClass("is-invalid");
-                closestDiv.text("The Consumption field is required");
-                closestDiv.removeClass("d-none");
-            } else {
-                $(this).removeClass("is-invalid");
-                closestDiv.addClass("d-none");
-            }
-
-            if (qty_c <= 0) {
-                status = false;
-                $(this).addClass("is-invalid");
-                closestDiv.text("The Consumption field must be greater than 0");
-                closestDiv.removeClass("d-none");
-            } else {
-                $(this).removeClass("is-invalid");
-                closestDiv.addClass("d-none");
-            }
-        });
-
-        
-        let rowCount = $(".rowCount").length;
-
-        if (!Number(rowCount)) {
-            status = false;
-            $(".rawmaterialsec tbody").html(
-                "<tr><td colspan='6' class='text-danger errorMsg'>Please add at least one Raw Material</td></tr>"
-            );
-            //scroll to top
-            $("html, body").animate({ scrollTop: 0 }, "slow");
-        }
-
-        if (status == false) {
-            $("html, body").animate({ scrollTop: 0 }, "slow");
-            return false;
+            qtyErr.removeClass("d-none").text("Consumption must be greater than 0");
+        } else {
+            qtyErr.addClass("d-none");
         }
     });
+
+    return status;
+});
 
     function showErrorMessage(id, message) {
         $("#"+id+"").addClass("is-invalid");

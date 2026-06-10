@@ -118,9 +118,9 @@ $(document).ready(function () {
                 '<td><input type="text" id="delivery_date_' +
                 i +
                 '" name="delivery_date_product[]" class="form-control customDatepicker" placeholder="Delivery Date"></td>' +
-                '<td class="text-center align-middle"><span id="production_status_' +
+                '<td><select name="status[]" id="fstatus_id_' +
                 i +
-                '">N/A</span></td>' +
+                '" class="form-control fstatus_id select2"><option value="none">None</option><option value="in_progress">In Progress</option><option value="done">Done</option></select></td>' +
                 '<td class="align-middle"><span id="deliveries_qty_' +
                 i +
                 '">0</span></td>' +

@@ -29,7 +29,8 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
                 </td>
                 <td class="w-50 text-right">
                     <img src="{!! getBaseURL() .
-                        (isset(getWhiteLabelInfo()->logo) ? 'uploads/white_label/' . getWhiteLabelInfo()->logo : 'images/logo.png') !!}" alt="site-logo">
+                        (isset(getWhiteLabelInfo()->logo) ? 'uploads/white_label/' . getWhiteLabelInfo()->logo : 'images/logo.png') !!}"
+                        alt="site-logo">
                 </td>
             </tr>
         </table>
@@ -50,21 +51,21 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
                     <p class="pb-7 rgb-71">
                         <span class="">@lang('index.manufacture_type'):</span>
                         @if ($obj->manufacture_type == 'ime')
-                            Instant Manufacture Entry
+                        Instant Manufacture Entry
                         @elseif($obj->manufacture_type == 'mbs')
-                            Manufacture by Scheduling
+                        Manufacture by Scheduling
                         @elseif($obj->manufacture_type == 'fco')
-                            From Customer Order
+                        From Customer Order
                         @endif
                     </p>
                     <p class="pb-7 rgb-71">
                         <span class="">@lang('index.status'):</span>
                         @if ($obj->manufacture_status == 'draft')
-                            Draft
+                        Draft
                         @elseif($obj->manufacture_status == 'inProgress')
-                            In Progress
+                        In Progress
                         @elseif($obj->manufacture_status == 'done')
-                            Done
+                        Done
                         @endif
                     </p>
                 </td>
@@ -86,16 +87,16 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
                         {{ $obj->complete_date != null ? getDateFormat($obj->complete_date) : 'N/A' }}
                     </p>
                     @if (isset($obj->batch_no) && !empty($obj->batch_no))
-                        <p class="pb-7 rgb-71">
-                            <span class="">@lang('index.batch_no'):</span>
-                            {{ $obj->batch_no }}
-                        </p>
+                    <p class="pb-7 rgb-71">
+                        <span class="">@lang('index.batch_no'):</span>
+                        {{ $obj->batch_no }}
+                    </p>
                     @endif
                     @if (isset($obj->expiry_days) && !empty($obj->expiry_days))
-                        <p class="pb-7 rgb-71">
-                            <span class="">@lang('index.expiry_days'):</span>
-                            {{ $obj->complete_date != null || $obj->expiry_days != null ? getDateFormat(expireDate($obj->complete_date, $obj->expiry_days)) : 'N/A' }}
-                        </p>
+                    <p class="pb-7 rgb-71">
+                        <span class="">@lang('index.expiry_days'):</span>
+                        {{ $obj->complete_date != null || $obj->expiry_days != null ? getDateFormat(expireDate($obj->complete_date, $obj->expiry_days)) : 'N/A' }}
+                    </p>
                     @endif
                 </td>
             </tr>
@@ -113,22 +114,22 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
             </thead>
             <tbody>
                 @if (isset($m_rmaterials) && $m_rmaterials)
-                    <?php
+                <?php
                     $i = 1;
                     ?>
-                    @foreach ($m_rmaterials as $key => $value)
-                        <tr class="rowCount">
-                            <td class="width_1_p">
-                                <p class="set_sn">{{ $i++ }}</p>
-                            </td>
-                            <td class="text-start">{{ getRMName($value->rmaterials_id) }}</td>
-                            <td class="text-start">{{ getAmtCustom($value->unit_price) }}</td>
-                            <td class="text-start">{{ $value->consumption }}
-                                {{ getPurchaseUnitByRMID($value->rmaterials_id) }}
-                            </td>
-                            <td class="text-right padding-0">{{ getAmtCustom($value->total_cost) }}</td>
-                        </tr>
-                    @endforeach
+                @foreach ($m_rmaterials as $key => $value)
+                <tr class="rowCount">
+                    <td class="width_1_p">
+                        <p class="set_sn">{{ $i++ }}</p>
+                    </td>
+                    <td class="text-start">{{ getRMName($value->rmaterials_id) }}</td>
+                    <td class="text-start">{{ getAmtCustom($value->unit_price) }}</td>
+                    <td class="text-start">{{ $value->consumption }}
+                        {{ getPurchaseUnitByRMID($value->rmaterials_id) }}
+                    </td>
+                    <td class="text-right padding-0">{{ getAmtCustom($value->total_cost) }}</td>
+                </tr>
+                @endforeach
                 @endif
             </tbody>
             <tfoot>
@@ -151,21 +152,21 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
             </thead>
             <tbody>
                 @if (isset($m_nonitems) && $m_nonitems)
-                    <?php
+                <?php
                     $j = 1;
                     ?>
-                    @foreach ($m_nonitems as $key => $value)
-                        <tr class="rowCount">
-                            <td class="width_1_p">
-                                <p class="set_sn">{{ $j++ }}</p>
-                            </td>
-                            <td class="text-start"> {{ getNonInventroyItem($value->noninvemtory_id) }}
-                            </td>
-                            <td class="text-right padding-0">{{ getAmtCustom($value->nin_cost) }}</td>
-                            <td class="text-right">{{ getAccountName($value->account_id) }}
-                            </td>
-                        </tr>
-                    @endforeach
+                @foreach ($m_nonitems as $key => $value)
+                <tr class="rowCount">
+                    <td class="width_1_p">
+                        <p class="set_sn">{{ $j++ }}</p>
+                    </td>
+                    <td class="text-start"> {{ getNonInventroyItem($value->noninvemtory_id) }}
+                    </td>
+                    <td class="text-right padding-0">{{ getAmtCustom($value->nin_cost) }}</td>
+                    <td class="text-right">{{ getAccountName($value->account_id) }}
+                    </td>
+                </tr>
+                @endforeach
                 @endif
             </tbody>
             <tfoot>
@@ -191,15 +192,15 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
             </thead>
             <tbody>
                 @if (isset($m_stages) && $m_stages)
-                    <?php
+                <?php
                     $k = 1;
                     $total_month = 0;
                     $total_day = 0;
                     $total_hour = 0;
                     $total_mimute = 0;
                     ?>
-                    @foreach ($m_stages as $key => $value)
-                        <?php
+                @foreach ($m_stages as $key => $value)
+                <?php
                         $checked = '';
                         $tmp_key = $key + 1;
                         if ($obj->stage_counter == $tmp_key) {
@@ -223,21 +224,21 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
                         $total_minutes = floor(($total_stages % 3600) / 60);
                         
                         ?>
-                        <tr class="rowCount">
-                            <td class="width_1_p">
-                                <p class="set_sn">{{ $k++ }}</p>
-                            </td>
-                            <td class="text-left">
-                                {{ getProductionStages($value->productionstage_id) }}</td>
-                            <td class="text-center">{{ $value->stage_month }}</td>
-                            <td class="text-center">{{ $value->stage_day }}
-                            </td>
-                            <td class="text-center">{{ $value->stage_hours }}
-                            </td>
-                            <td class="text-center">{{ $value->stage_minute }}
-                            </td>
-                        </tr>
-                    @endforeach
+                <tr class="rowCount">
+                    <td class="width_1_p">
+                        <p class="set_sn">{{ $k++ }}</p>
+                    </td>
+                    <td class="text-left">
+                        {{ getProductionStages($value->productionstage_id) }}</td>
+                    <td class="text-center">{{ $value->stage_month }}</td>
+                    <td class="text-center">{{ $value->stage_day }}
+                    </td>
+                    <td class="text-center">{{ $value->stage_hours }}
+                    </td>
+                    <td class="text-center">{{ $value->stage_minute }}
+                    </td>
+                </tr>
+                @endforeach
                 @endif
             </tbody>
             <tfoot>
@@ -277,28 +278,31 @@ $whiteLabelInfo = App\WhiteLabelSettings::first();
                         </tr>
                     </table>
                     @php
-                        $collect_tax = $tax_items->collect_tax;
-                        $tax_information = json_decode(
-                            isset($obj->tax_information) && $obj->tax_information ? $obj->tax_information : '',
-                        );
+                    $collect_tax = optional($tax_setting)->collect_tax ?? 'No';
+
+                    $tax_information = json_decode(
+                    isset($obj->tax_information) && $obj->tax_information
+                    ? $obj->tax_information
+                    : ''
+                    );
                     @endphp
                     @foreach ($tax_fields as $tax_field)
-                        @if ($tax_information)
-                            @foreach ($tax_information as $single_tax)
-                                @if ($tax_field->id == $single_tax->tax_field_id)
-                                    <table>
-                                        <tr>
-                                            <td class="w-50">
-                                                <p class="">{{ $tax_field->tax }}</p>
-                                            </td>
-                                            <td class="w-50 text-right">
-                                                <p>{{ intval($single_tax->tax_field_percentage) }}%</p>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                @endif
-                            @endforeach                            
-                        @endif
+                    @if ($tax_information)
+                    @foreach ($tax_information as $single_tax)
+                    @if ($tax_field->id == $single_tax->tax_field_id)
+                    <table>
+                        <tr>
+                            <td class="w-50">
+                                <p class="">{{ $tax_field->tax }}</p>
+                            </td>
+                            <td class="w-50 text-right">
+                                <p>{{ intval($single_tax->tax_field_percentage) }}%</p>
+                            </td>
+                        </tr>
+                    </table>
+                    @endif
+                    @endforeach
+                    @endif
                     @endforeach
                     <table>
                         <tr>

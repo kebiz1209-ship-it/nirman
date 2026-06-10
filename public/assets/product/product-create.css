@@ -1,0 +1,253 @@
+.main-content-wrapper,
+.main-content-wrapper * {
+    font-family: inherit !important;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.content-header {
+    margin-bottom: 20px;
+}
+
+.back-btn,
+.save-btn {
+    border-radius: 6px !important;
+    font-weight: 600;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+}
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.product-tabs {
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid #dbe3ea !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.product-tabs > li {
+    margin: 0 !important;
+}
+
+.product-tabs > li > a {
+    padding: 12px 20px !important;
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555 !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px 8px 0 0;
+    background: #f8fafc !important;
+    transition: 0.2s ease;
+    text-decoration: none !important;
+}
+
+.product-tabs > li > a:hover {
+    background: #eef2ff !important;
+    color: #2563eb !important;
+}
+
+.product-tabs > li.active > a,
+.product-tabs > li.active > a:hover,
+.product-tabs > li.active > a:focus {
+    color: #2563eb !important;
+    background: #fff !important;
+    border: 1px solid #dbe3ea !important;
+    border-bottom: 2px solid #2563eb !important;
+}
+
+/* =========================================================
+   TAB CONTENT
+========================================================= */
+
+.tab-content {
+    padding: 25px 10px 10px;
+    background: #fff;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active,
+.tab-pane.in.active {
+    display: block;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.tab-box {
+    padding-top: 5px;
+}
+
+.row {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 6px;
+    display: inline-block;
+}
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.form-control,
+.select2-container--default .select2-selection--single {
+    height: 42px !important;
+    border-radius: 6px !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+}
+
+/* =========================================================
+   SELECT DROPDOWN
+========================================================= */
+
+select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding-right: 42px !important;
+
+    background-color: #fff !important;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, #6b7280 50%),
+        linear-gradient(135deg, #6b7280 50%, transparent 50%);
+
+    background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 12px) calc(50% - 3px);
+
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+}
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+textarea.form-control {
+    height: auto !important;
+    min-height: 100px;
+    resize: vertical;
+    padding-top: 10px;
+}
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+.form-control:focus,
+select.form-control:focus,
+textarea.form-control:focus {
+    border-color: #93c5fd !important;
+    box-shadow: 0 0 0 0.15rem rgba(59,130,246,.15) !important;
+    outline: none !important;
+}
+
+/* =========================================================
+   CHECKBOX SECTION
+========================================================= */
+
+.checkbox-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    background: #fafafa;
+}
+
+.checkbox-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #111827;
+}
+
+.checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px 25px;
+}
+
+.checkbox-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 240px;
+}
+
+.checkbox-box input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+}
+
+.checkbox-box label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #374151;
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.btn-primary {
+    border-radius: 6px !important;
+    padding: 10px 20px !important;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .product-tabs {
+        display: block;
+    }
+
+    .product-tabs > li {
+        width: 100%;
+        margin-bottom: 5px !important;
+    }
+
+    .product-tabs > li > a {
+        border-radius: 6px !important;
+    }
+
+    .checkbox-grid {
+        display: block;
+    }
+
+    .checkbox-box {
+        margin-bottom: 12px;
+    }
+}

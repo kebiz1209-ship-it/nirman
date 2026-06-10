@@ -444,7 +444,8 @@ Route::get('/stock-dashboard', [App\Http\Controllers\StockController::class, 'da
 
 
 
-Route::get('get-product-code/{category_id}', [FinishedProductController::class, 'getProductCode']);
+Route::get('get-product-code/{category_id}', [App\Http\Controllers\FinishedProductController::class, 'getProductCode']);
+Route::get('/get-product-code/{category_id}', [App\Http\Controllers\FinishedProductController::class, 'getProductCode']);
 
 
 

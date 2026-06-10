@@ -292,6 +292,10 @@ class AjaxController extends Controller
         $total_day = 0;
         $total_hour = 0;
         $total_mimute = 0;
+        $total_months = 0;
+        $total_hours = 0;
+        $total_days = 0;
+        $total_minutes = 0;
         $i = 1;
         foreach ($finishProductStage as $key => $value) {
             $total_value = (($value->stage_month * 2592000) + ($value->stage_day * 86400) + ($value->stage_hours * 3600) + ($value->stage_minute * 60)) * $product_quantity;
@@ -380,10 +384,11 @@ class AjaxController extends Controller
                     <td class="width_1_p text-start"><p class="set_sn">1</p></td>
                     <td><input type="hidden" value="' . $product_id . '" name="selected_product_id[]">
                     <input type="hidden" value="' . $productInfo->current_total_stock . '" class="current_stock" name="current_stock[]">
-                    <input type="hidden" value="' . $value->id . '" name="rm_id[]"><span>' . $productInfo->name . '(' . $productInfo->code . ')</span></td>
-                    <td><div class="input-group"><input type="text" tabindex="5" name="unit_price[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning unit_price_c cal_row" placeholder="Unit Price" value="' . $unit_price . '"><span class="input-group-text">' . $item_currency_modal . '</span></div><span class="text-danger"></span></td>
+                    <input type="hidden" value="' . $value->id . '" name="rm_id[]"><input type="hidden" value="' . $value->id . '" name="manufacture_id[]"><span>' . $productInfo->name . '(' . $productInfo->code . ')</span></td>
+                    <td><div class="input-group"><input type="text" tabindex="5" name="unit_price[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning unit_price_c cal_row" placeholder="Unit Price" value="' . $unit_price . '"><span class="input-group-text currency_symbol_display">' . $item_currency_modal . '</span></div><span class="text-danger"></span></td>
                     <td><div class="input-group"><input type="text" data-countid="1" tabindex="51" id="quantity_amount_1" name="quantity_amount[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning qty_c cal_row" value="' . $item_quantity . '" placeholder="Qty/Amount" ><span class="input-group-text">' . $item_unit_modal . '</span></div><span class="text-danger"></span></td>
-                    <td><div class="input-group"><input type="text" id="total_1" name="total[]" class="form-control input_aligning total_c" placeholder="Total" readonly=""><span class="input-group-text">' . $item_currency_modal . '</span></div></td>
+                    <td><div class="input-group"><input type="text" id="total_1" name="total[]" class="form-control input_aligning total_c" placeholder="Total" readonly=""><span class="input-group-text currency_symbol_display">' . $item_currency_modal . '</span></div></td>
+                    <td><div class="input-group"><input type="number" class="form-control input_aligning total_inr_c" id="total_inr_1" placeholder="INR Total" readonly=""><span class="input-group-text">₹</span></div></td>
                     <td class="ir_txt_center"><a class="btn btn-xs del_row dlt_button"><iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon></a></td>
                 </tr>';
             }
@@ -440,9 +445,10 @@ class AjaxController extends Controller
                     $html .= 'Expiry Date: ' . getDateFormat(expireDate($value->complete_date, $value->expiry_days));
                 }
                 $html .= '</td>
-                    <td><div class="input-group"><input type="text" tabindex="5" name="unit_price[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning unit_price_c cal_row" placeholder="Unit Price" value="' . $unit_price . '"><span class="input-group-text">' . $item_currency_modal . '</span></div><span class="text-danger"></span></td>
+                    <td><div class="input-group"><input type="text" tabindex="5" name="unit_price[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning unit_price_c cal_row" placeholder="Unit Price" value="' . $unit_price . '"><span class="input-group-text currency_symbol_display">' . $item_currency_modal . '</span></div><span class="text-danger"></span></td>
                     <td><div class="input-group"><input type="text" data-countid="1" tabindex="51" id="quantity_amount_1" name="quantity_amount[]" onfocus="this.select();" class="check_required form-control integerchk input_aligning qty_c cal_row" value="' . $item_quantity . '" placeholder="Qty/Amount" ><span class="input-group-text">' . $item_unit_modal . '</span></div><span class="text-danger"></span></td>
-                    <td><div class="input-group"><input type="text" id="total_1" name="total[]" class="form-control input_aligning total_c" placeholder="Total" readonly=""><span class="input-group-text">' . $item_currency_modal . '</span></div></td>
+                    <td><div class="input-group"><input type="text" id="total_1" name="total[]" class="form-control input_aligning total_c" placeholder="Total" readonly=""><span class="input-group-text currency_symbol_display">' . $item_currency_modal . '</span></div></td>
+                    <td><div class="input-group"><input type="number" class="form-control input_aligning total_inr_c" id="total_inr_1" placeholder="INR Total" readonly=""><span class="input-group-text">₹</span></div></td>
                     <td class="ir_txt_center"><a class="btn btn-xs del_row dlt_button"><iconify-icon icon="solar:trash-bin-minimalistic-broken"></iconify-icon></a></td>
                 </tr>';
             }

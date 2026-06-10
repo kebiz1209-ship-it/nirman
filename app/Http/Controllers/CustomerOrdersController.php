@@ -14,6 +14,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Region;
+use App\FPCategory;
+
 
 class CustomerOrdersController extends Controller
 {
@@ -29,7 +31,10 @@ class CustomerOrdersController extends Controller
      */
     public function index()
     {
-        $obj = CustomerOrder::where('del_status', "Live")->orderBy('id', 'DESC')->get();
+        $obj = CustomerOrder::with('region')
+            ->where('del_status', "Live")
+            ->orderBy('id', 'DESC')
+            ->get();
         $title = __('index.customer_order');
 
         return view('pages.customer_order.index', compact('title', 'obj'));
@@ -37,9 +42,9 @@ class CustomerOrdersController extends Controller
 
 
     public function dashboard()
-{
-    return view('pages.customer_order.dashboard');
-}
+    {
+        return view('pages.customer_order.dashboard');
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -62,15 +67,33 @@ class CustomerOrdersController extends Controller
 
         $units = Unit::orderBy('name', 'ASC')->where('del_status', "Live")->get();
 
-        $productList = FinishedProduct::orderBy('name', 'ASC')->where('del_status', "Live")->get();
+        $productList = FinishedProduct::orderBy('name', 'ASC')
+            ->where('del_status', "Live")
+            ->get();
+
         $product = $productList->pluck('name', 'id');
         $customerOrder = array();
 
         $regions = Region::where('status', 1)
-    ->orderBy('name', 'ASC')
-    ->pluck('name', 'id');
+            ->orderBy('name', 'ASC')
+            ->pluck('name', 'id');
 
-        return view('pages.customer_order.create', compact('title', 'customerOrder', 'ref_no', 'customers', 'orderTypes', 'units', 'productList', 'product', 'regions'));
+        $categories = FPCategory::where('del_status', 'Live')
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        return view('pages.customer_order.create', compact(
+            'title',
+            'customerOrder',
+            'ref_no',
+            'customers',
+            'orderTypes',
+            'units',
+            'productList',
+            'product',
+            'regions',
+            'categories'
+        ));
     }
 
     /**
@@ -79,154 +102,475 @@ class CustomerOrdersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-  
+
+
+public function getProducts($category_id)
+{
+    try {
+        \Log::info('getProducts called with category_id: ' . $category_id);
+        
+        $products = FinishedProduct::where('category', $category_id)
+            ->where('del_status', 'Live')
+            ->select('id', 'name', 'code')
+            ->orderBy('name', 'ASC')
+            ->get();
+            
+        \Log::info('Products found: ' . $products->count());
+
+        return response()->json([
+            'success' => true,
+            'products' => $products
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Error in getProducts: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'products' => [],
+            'error' => $e->getMessage()
+        ]);
+    }
+}
+
+    public function getProductFormula($id)
+    {
+        try {
+            $product = FinishedProduct::with(['rmaterials', 'nonInventory', 'stage'])
+                ->find($id);
+
+            if (!$product) {
+                return response()->json(['formula_description' => '']);
+            }
+
+            // Build formula description from related data
+            $formulaDescription = "PRODUCT FORMULA\n";
+            $formulaDescription .= "================\n";
+            $formulaDescription .= "Product: " . $product->name . "\n";
+            $formulaDescription .= "Code: " . $product->code . "\n";
+            $formulaDescription .= "Unit: " . ($product->unit ? $product->unit->name : 'N/A') . "\n";
+            $formulaDescription .= "Stock Method: " . $product->stock_method . "\n\n";
+
+            // Add raw materials (using rmaterials relationship)
+            if ($product->rmaterials && $product->rmaterials->count() > 0) {
+                $formulaDescription .= "RAW MATERIALS:\n";
+                $formulaDescription .= "----------------\n";
+                foreach ($product->rmaterials as $item) {
+                    $rawMaterial = \App\RawMaterial::find($item->rmaterials_id);
+                    $formulaDescription .= "• " . ($rawMaterial ? $rawMaterial->name : 'N/A') . "\n";
+                    $formulaDescription .= "  - Consumption: " . $item->consumption . " units\n";
+                    $formulaDescription .= "  - Unit Price: " . number_format($item->unit_price, 2) . "\n";
+                    $formulaDescription .= "  - Total Cost: " . number_format($item->total_cost, 2) . "\n\n";
+                }
+            }
+
+            // Add non-inventory items (using nonInventory relationship)
+            if ($product->nonInventory && $product->nonInventory->count() > 0) {
+                $formulaDescription .= "NON-INVENTORY ITEMS:\n";
+                $formulaDescription .= "--------------------\n";
+                foreach ($product->nonInventory as $item) {
+                    $nonItem = \App\NonIItem::find($item->noninvemtory_id);
+                    $formulaDescription .= "• " . ($nonItem ? $nonItem->name : 'N/A') . "\n";
+                    $formulaDescription .= "  - Cost: " . number_format($item->nin_cost, 2) . "\n\n";
+                }
+            }
+
+            // Add production stages (using stage relationship)
+            if ($product->stage && $product->stage->count() > 0) {
+                $formulaDescription .= "PRODUCTION STAGES:\n";
+                $formulaDescription .= "------------------\n";
+                foreach ($product->stage as $stage) {
+                    $productionStage = \App\ProductionStage::find($stage->productionstage_id);
+                    $formulaDescription .= "• " . ($productionStage ? $productionStage->name : 'N/A') . "\n";
+                    $formulaDescription .= "  - Duration: " . $stage->stage_month . " months, ";
+                    $formulaDescription .= $stage->stage_day . " days, ";
+                    $formulaDescription .= $stage->stage_hours . " hours, ";
+                    $formulaDescription .= $stage->stage_minute . " minutes\n\n";
+                }
+            }
+
+            // Add cost summary
+            $formulaDescription .= "COST SUMMARY\n";
+            $formulaDescription .= "=============\n";
+            $formulaDescription .= "Raw Material Cost: " . number_format($product->rmcost_total, 2) . "\n";
+            $formulaDescription .= "Non-Inventory Cost: " . number_format($product->noninitem_total, 2) . "\n";
+            $formulaDescription .= "Total Cost: " . number_format($product->total_cost, 2) . "\n";
+            $formulaDescription .= "Profit Margin: " . $product->profit_margin . "%\n";
+            $formulaDescription .= "Sale Price: " . number_format($product->sale_price, 2) . "\n";
+
+            // Add required time
+            $formulaDescription .= "\nREQUIRED PRODUCTION TIME:\n";
+            $formulaDescription .= "=========================\n";
+            $formulaDescription .= $product->required_time . "\n";
+
+            return response()->json([
+                'formula_description' => $formulaDescription
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error getting product formula: ' . $e->getMessage());
+            return response()->json(['formula_description' => '']);
+        }
+    }
+
+    /**
+     * Save product formula (if you have a separate formulas table)
+     */
+    public function saveProductFormula(Request $request)
+    {
+        try {
+            $request->validate([
+                'product_id' => 'required|exists:tbl_finish_products,id',
+                'formula_description' => 'required'
+            ]);
+
+            // You can either:
+            // Option 1: Save to a separate formulas table
+            // Option 2: Update a 'formula' field in the finished_products table (add migration first)
+
+            $product = FinishedProduct::find($request->product_id);
+
+            // If you add a 'formula' column to tbl_finish_products
+            // $product->formula = $request->formula_description;
+            // $product->save();
+
+            // Or store in a separate table (recommended)
+            \App\ProductFormula::updateOrCreate(
+                ['product_id' => $request->product_id],
+                [
+                    'formula_code' => $request->formula_code,
+                    'description' => $request->formula_description,
+                    'updated_by' => auth()->user()->id
+                ]
+            );
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+
+    //     public function store(Request $request)
+// {
+//     request()->validate([
+//         'reference_no' => 'required|max:50',
+//         'customer_id' => 'required',
+//         'order_type' => 'required',
+//         'delivery_date' => 'required_if:order_type,Quotation',
+
+    //         // New Fields
+//         'order_date' => 'nullable|date',
+//         'region_country' => 'nullable|max:100',
+//         'business_type' => 'nullable|max:100',
+//         'purpose' => 'nullable|max:255',
+//         'product_service' => 'nullable|max:255',
+//         'product_description' => 'nullable',
+//         'handler_id' => 'nullable',
+//         'total_quantity' => 'nullable|max:100',
+//         'specifications' => 'nullable',
+//         'sales_person_id' => 'nullable',
+//         'dispatch_status' => 'nullable|max:50',
+//         'expected_dispatch_date' => 'nullable|date',
+//         'actual_dispatch_date' => 'nullable|date',
+//         'delay_days' => 'nullable|integer',
+//         'remarks' => 'nullable',
+//     ]);
+
+    //     try {
+
+    //         $productList = $request->get('product');
+
+    //         $customerOrder = new \App\CustomerOrder();
+
+    //         // Existing Fields
+//         $customerOrder->reference_no = null_check(escape_output($request->get('reference_no')));
+//         $customerOrder->customer_id = null_check(escape_output($request->get('customer_id')));
+//         $customerOrder->order_type = escape_output($request->get('order_type'));
+//         $customerOrder->delivery_date = string_date_null_check(escape_output($request->get('delivery_date')));
+//         $customerOrder->delivery_address = escape_output($request->get('delivery_address'));
+//         $customerOrder->total_product = null_check(sizeof($productList));
+//         $customerOrder->total_amount = null_check(escape_output($request->get('total_subtotal')));
+//         $customerOrder->total_cost = $request->filled('total_cost') ? floatval($request->total_cost) : 0;
+//         $customerOrder->total_profit = $request->filled('total_profit') ? floatval($request->total_profit) : 0;
+//         $customerOrder->quotation_note = escape_output($request->get('quotation_note'));
+//         $customerOrder->internal_note = escape_output($request->get('internal_note'));
+//         $customerOrder->order_status = '1';
+//         $customerOrder->created_by = auth()->user()->id;
+
+    //         // New Fields
+//         $customerOrder->order_date = string_date_null_check(escape_output($request->get('order_date')));
+//         $customerOrder->region_country = escape_output($request->get('region_country'));
+//         $customerOrder->business_type = escape_output($request->get('business_type'));
+//         $customerOrder->purpose = escape_output($request->get('purpose'));
+//         $customerOrder->product_service = escape_output($request->get('product_service'));
+//         $customerOrder->product_description = escape_output($request->get('product_description'));
+//         $customerOrder->handler_id = null_check($request->get('handler_id'));
+//         $customerOrder->quantity = escape_output($request->get('total_quantity'));
+//         $customerOrder->specifications = escape_output($request->get('specifications'));
+//         $customerOrder->sales_person_id = null_check($request->get('sales_person_id'));
+//         $customerOrder->dispatch_status = escape_output($request->get('dispatch_status'));
+//         $customerOrder->expected_dispatch_date = string_date_null_check(
+//             escape_output($request->get('expected_dispatch_date'))
+//         );
+//         $customerOrder->actual_dispatch_date = string_date_null_check(
+//             escape_output($request->get('actual_dispatch_date'))
+//         );
+//         $customerOrder->delay_days = null_check($request->get('delay_days'));
+//         $customerOrder->remarks = escape_output($request->get('remarks'));
+
+    //         $customerOrder->save();
+
+    //         // Product Details
+//         foreach ($productList as $row => $value) {
+
+    //             $quantity = null_check(escape_output($_POST['quantity'][$row]));
+//             $cost_per_unit = null_check(escape_output($_POST['cost'][$row]));
+
+    //             $obj = new \App\CustomerOrderDetails();
+
+    //             $obj->customer_order_id = $customerOrder->id;
+//             $obj->product_id = null_check(escape_output($_POST['product'][$row]));
+//             $obj->quantity = $quantity;
+//             $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row]));
+//             $obj->discount_percent = null_check(escape_output($_POST['discount_percent'][$row]));
+//             $obj->sub_total = null_check(escape_output($_POST['sub_total'][$row]));
+//             $obj->total_cost = $cost_per_unit * $quantity;
+//             $obj->profit = null_check(escape_output($_POST['profit'][$row]));
+//             $obj->delivery_date = string_date_null_check(
+//                 escape_output($_POST['delivery_date_product'][$row])
+//             );
+
+    //             $obj->production_status = 0;
+//             $obj->delivered_qty = 0;
+
+    //             $obj->save();
+//         }
+
+    //         // Invoice
+//         if (!empty($request->invoice_type)) {
+
+    //             foreach ($request->invoice_type as $key => $value) {
+
+    //                 $inv_obj = new \App\CustomerOrderInvoice();
+
+    //                 $inv_obj->customer_order_id = null_check($customerOrder->id);
+//                 $inv_obj->invoice_type = ($request->invoice_type[$key]);
+//                 $inv_obj->amount = null_check($request->invoice_amount[$key]);
+//                 $inv_obj->invoice_date = ($request->invoice_date[$key]);
+//                 $inv_obj->paid_amount = null_check($request->invoice_paid[$key]);
+//                 $inv_obj->due_amount = null_check($request->invoice_due[$key]);
+//                 $inv_obj->order_due_amount = null_check($request->invoice_order_due[$key]);
+
+    //                 $inv_obj->save();
+//             }
+//         }
+
+    //         // Deliveries
+//         if (!empty($request->delivaries_date)) {
+
+    //             foreach ($request->delivaries_date as $key => $value) {
+
+    //                 $del_obj = new \App\CustomerOrderDelivery();
+
+    //                 $del_obj->customer_order_id = null_check($customerOrder->id);
+//                 $del_obj->product_id = null_check($request->delivaries_product[$key]);
+//                 $del_obj->quantity = null_check($request->delivaries_quantity[$key]);
+//                 $del_obj->delivery_date = string_date_null_check(
+//                     escape_output($request->delivaries_date[$key])
+//                 );
+
+    //                 $del_obj->delivery_note = ($request->delivaries_note[$key]) ?? null;
+//                 $del_obj->delivery_status = ($request->delivaries_status[$key]) ?? null;
+
+    //                 $del_obj->save();
+//             }
+//         }
+
+    //         return redirect('customer-orders')->with(saveMessage());
+
+    //     } catch (\Exception $e) {
+
+    //         return redirect()->back()
+//             ->withInput($request->all())
+//             ->with(dangerMessage($e->getMessage()));
+//     }
+// }
+
 
 
     public function store(Request $request)
-{
-    request()->validate([
-        'reference_no' => 'required|max:50',
-        'customer_id' => 'required',
-        'order_type' => 'required',
-        'delivery_date' => 'required_if:order_type,Quotation',
+    {
+        request()->validate([
+            'reference_no' => 'required|max:50',
+            'customer_id' => 'required',
+            'order_type' => 'required',
+            'delivery_date' => 'required_if:order_type,Quotation',
 
-        // New Fields
-        'order_date' => 'nullable|date',
-        'region_country' => 'nullable|max:100',
-        'business_type' => 'nullable|max:100',
-        'purpose' => 'nullable|max:255',
-        'product_service' => 'nullable|max:255',
-        'product_description' => 'nullable',
-        'handler_id' => 'nullable',
-        'total_quantity' => 'nullable|max:100',
-        'specifications' => 'nullable',
-        'sales_person_id' => 'nullable',
-        'dispatch_status' => 'nullable|max:50',
-        'expected_dispatch_date' => 'nullable|date',
-        'actual_dispatch_date' => 'nullable|date',
-        'delay_days' => 'nullable|integer',
-        'remarks' => 'nullable',
-    ]);
+            // New Fields
+            'order_date' => 'nullable|date',
+            'region_id' => 'nullable|exists:regions,id',
+            'business_type' => 'nullable|max:100',
+            'purpose' => 'nullable|max:255',
+            'product_service' => 'nullable|max:255',
+            'product_description' => 'nullable',
+            'handler_id' => 'nullable',
+            'total_quantity' => 'nullable|max:100',
+            'specifications' => 'nullable',
+            'sales_person_id' => 'nullable',
+            'dispatch_status' => 'nullable|max:50',
+            'expected_dispatch_date' => 'nullable|date',
+            'actual_dispatch_date' => 'nullable|date',
+            'delay_days' => 'nullable|integer',
+            'remarks' => 'nullable',
+        ]);
 
-    try {
+        try {
 
-        $productList = $request->get('product');
+            $productList = $request->get('product');
 
-        $customerOrder = new \App\CustomerOrder();
+            $customerOrder = new \App\CustomerOrder();
 
-        // Existing Fields
-        $customerOrder->reference_no = null_check(escape_output($request->get('reference_no')));
-        $customerOrder->customer_id = null_check(escape_output($request->get('customer_id')));
-        $customerOrder->order_type = escape_output($request->get('order_type'));
-        $customerOrder->delivery_date = string_date_null_check(escape_output($request->get('delivery_date')));
-        $customerOrder->delivery_address = escape_output($request->get('delivery_address'));
-        $customerOrder->total_product = null_check(sizeof($productList));
-        $customerOrder->total_amount = null_check(escape_output($request->get('total_subtotal')));
-        $customerOrder->total_cost = $request->filled('total_cost') ? floatval($request->total_cost) : 0;
-        $customerOrder->total_profit = $request->filled('total_profit') ? floatval($request->total_profit) : 0;
-        $customerOrder->quotation_note = escape_output($request->get('quotation_note'));
-        $customerOrder->internal_note = escape_output($request->get('internal_note'));
-        $customerOrder->order_status = '1';
-        $customerOrder->created_by = auth()->user()->id;
+            // Existing Fields
+            $customerOrder->reference_no = null_check(escape_output($request->get('reference_no')));
+            $customerOrder->customer_id = null_check(escape_output($request->get('customer_id')));
+            $customerOrder->order_type = escape_output($request->get('order_type'));
+            $customerOrder->delivery_date = string_date_null_check(
+                escape_output($request->get('delivery_date'))
+            );
+            $customerOrder->delivery_address = escape_output($request->get('delivery_address'));
+            $customerOrder->total_product = null_check(sizeof($productList));
+            $customerOrder->total_amount = null_check(
+                escape_output($request->get('total_subtotal'))
+            );
+            $customerOrder->total_cost = $request->filled('total_cost')
+                ? floatval($request->total_cost)
+                : 0;
+            $customerOrder->total_profit = $request->filled('total_profit')
+                ? floatval($request->total_profit)
+                : 0;
+            $customerOrder->quotation_note = escape_output($request->get('quotation_note'));
+            $customerOrder->internal_note = escape_output($request->get('internal_note'));
+            $customerOrder->order_status = '1';
+            $customerOrder->created_by = auth()->user()->id;
 
-        // New Fields
-        $customerOrder->order_date = string_date_null_check(escape_output($request->get('order_date')));
-        $customerOrder->region_country = escape_output($request->get('region_country'));
-        $customerOrder->business_type = escape_output($request->get('business_type'));
-        $customerOrder->purpose = escape_output($request->get('purpose'));
-        $customerOrder->product_service = escape_output($request->get('product_service'));
-        $customerOrder->product_description = escape_output($request->get('product_description'));
-        $customerOrder->handler_id = null_check($request->get('handler_id'));
-        $customerOrder->quantity = escape_output($request->get('total_quantity'));
-        $customerOrder->specifications = escape_output($request->get('specifications'));
-        $customerOrder->sales_person_id = null_check($request->get('sales_person_id'));
-        $customerOrder->dispatch_status = escape_output($request->get('dispatch_status'));
-        $customerOrder->expected_dispatch_date = string_date_null_check(
-            escape_output($request->get('expected_dispatch_date'))
-        );
-        $customerOrder->actual_dispatch_date = string_date_null_check(
-            escape_output($request->get('actual_dispatch_date'))
-        );
-        $customerOrder->delay_days = null_check($request->get('delay_days'));
-        $customerOrder->remarks = escape_output($request->get('remarks'));
-
-        $customerOrder->save();
-
-        // Product Details
-        foreach ($productList as $row => $value) {
-
-            $quantity = null_check(escape_output($_POST['quantity'][$row]));
-            $cost_per_unit = null_check(escape_output($_POST['cost'][$row]));
-
-            $obj = new \App\CustomerOrderDetails();
-
-            $obj->customer_order_id = $customerOrder->id;
-            $obj->product_id = null_check(escape_output($_POST['product'][$row]));
-            $obj->quantity = $quantity;
-            $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row]));
-            $obj->discount_percent = null_check(escape_output($_POST['discount_percent'][$row]));
-            $obj->sub_total = null_check(escape_output($_POST['sub_total'][$row]));
-            $obj->total_cost = $cost_per_unit * $quantity;
-            $obj->profit = null_check(escape_output($_POST['profit'][$row]));
-            $obj->delivery_date = string_date_null_check(
-                escape_output($_POST['delivery_date_product'][$row])
+            // New Fields
+            $customerOrder->order_date = string_date_null_check(
+                escape_output($request->get('order_date'))
             );
 
-            $obj->production_status = 0;
-            $obj->delivered_qty = 0;
+            // Region dropdown value from regions table
+            $customerOrder->region_id = null_check($request->get('region_id'));
 
-            $obj->save();
-        }
+            $customerOrder->business_type = escape_output($request->get('business_type'));
+            $customerOrder->purpose = escape_output($request->get('purpose'));
+            $customerOrder->product_service = escape_output($request->get('product_service'));
+            $customerOrder->product_description = escape_output($request->get('product_description'));
+            $customerOrder->handler_id = null_check($request->get('handler_id'));
+            $customerOrder->quantity = escape_output($request->get('total_quantity'));
+            $customerOrder->specifications = escape_output($request->get('specifications'));
+            $customerOrder->sales_person_id = null_check($request->get('sales_person_id'));
+            $customerOrder->dispatch_status = escape_output($request->get('dispatch_status'));
 
-        // Invoice
-        if (!empty($request->invoice_type)) {
+            $customerOrder->expected_dispatch_date = string_date_null_check(
+                escape_output($request->get('expected_dispatch_date'))
+            );
 
-            foreach ($request->invoice_type as $key => $value) {
+            $customerOrder->actual_dispatch_date = string_date_null_check(
+                escape_output($request->get('actual_dispatch_date'))
+            );
 
-                $inv_obj = new \App\CustomerOrderInvoice();
+            $customerOrder->delay_days = null_check($request->get('delay_days'));
+            $customerOrder->remarks = escape_output($request->get('remarks'));
 
-                $inv_obj->customer_order_id = null_check($customerOrder->id);
-                $inv_obj->invoice_type = ($request->invoice_type[$key]);
-                $inv_obj->amount = null_check($request->invoice_amount[$key]);
-                $inv_obj->invoice_date = ($request->invoice_date[$key]);
-                $inv_obj->paid_amount = null_check($request->invoice_paid[$key]);
-                $inv_obj->due_amount = null_check($request->invoice_due[$key]);
-                $inv_obj->order_due_amount = null_check($request->invoice_order_due[$key]);
+            $customerOrder->save();
 
-                $inv_obj->save();
-            }
-        }
+            /*
+            |-----------------------------------
+            | Product Details
+            |-----------------------------------
+            */
+            foreach ($productList as $row => $value) {
 
-        // Deliveries
-        if (!empty($request->delivaries_date)) {
+                $quantity = null_check(escape_output($_POST['quantity'][$row]));
+                $cost_per_unit = null_check(escape_output($_POST['cost'][$row]));
 
-            foreach ($request->delivaries_date as $key => $value) {
+                $obj = new \App\CustomerOrderDetails();
 
-                $del_obj = new \App\CustomerOrderDelivery();
-
-                $del_obj->customer_order_id = null_check($customerOrder->id);
-                $del_obj->product_id = null_check($request->delivaries_product[$key]);
-                $del_obj->quantity = null_check($request->delivaries_quantity[$key]);
-                $del_obj->delivery_date = string_date_null_check(
-                    escape_output($request->delivaries_date[$key])
+                $obj->customer_order_id = $customerOrder->id;
+                $obj->product_id = null_check(escape_output($_POST['product'][$row]));
+                $obj->quantity = $quantity;
+                $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row]));
+                $obj->discount_percent = null_check(escape_output($_POST['discount_percent'][$row]));
+                $obj->sub_total = null_check(escape_output($_POST['sub_total'][$row]));
+                $obj->total_cost = $cost_per_unit * $quantity;
+                $obj->profit = null_check(escape_output($_POST['profit'][$row]));
+                $obj->delivery_date = string_date_null_check(
+                    escape_output($_POST['delivery_date_product'][$row])
                 );
 
-                $del_obj->delivery_note = ($request->delivaries_note[$key]) ?? null;
-                $del_obj->delivery_status = ($request->delivaries_status[$key]) ?? null;
+                $obj->production_status = 0;
+                $obj->delivered_qty = 0;
 
-                $del_obj->save();
+                $obj->save();
             }
+
+            /*
+            |-----------------------------------
+            | Invoice
+            |-----------------------------------
+            */
+            if (!empty($request->invoice_type)) {
+
+                foreach ($request->invoice_type as $key => $value) {
+
+                    $inv_obj = new \App\CustomerOrderInvoice();
+
+                    $inv_obj->customer_order_id = null_check($customerOrder->id);
+                    $inv_obj->invoice_type = $request->invoice_type[$key];
+                    $inv_obj->amount = null_check($request->invoice_amount[$key]);
+                    $inv_obj->invoice_date = $request->invoice_date[$key];
+                    $inv_obj->paid_amount = null_check($request->invoice_paid[$key]);
+                    $inv_obj->due_amount = null_check($request->invoice_due[$key]);
+                    $inv_obj->order_due_amount = null_check($request->invoice_order_due[$key]);
+
+                    $inv_obj->save();
+                }
+            }
+
+            /*
+            |-----------------------------------
+            | Deliveries
+            |-----------------------------------
+            */
+            if (!empty($request->delivaries_date)) {
+
+                foreach ($request->delivaries_date as $key => $value) {
+
+                    $del_obj = new \App\CustomerOrderDelivery();
+
+                    $del_obj->customer_order_id = null_check($customerOrder->id);
+                    $del_obj->product_id = null_check($request->delivaries_product[$key]);
+                    $del_obj->quantity = null_check($request->delivaries_quantity[$key]);
+                    $del_obj->delivery_date = string_date_null_check(
+                        escape_output($request->delivaries_date[$key])
+                    );
+
+                    $del_obj->delivery_note = $request->delivaries_note[$key] ?? null;
+                    $del_obj->delivery_status = $request->delivaries_status[$key] ?? null;
+
+                    $del_obj->save();
+                }
+            }
+
+            return redirect('customer-orders')->with(saveMessage());
+
+        } catch (\Exception $e) {
+
+            return redirect()->back()
+                ->withInput($request->all())
+                ->with(dangerMessage($e->getMessage()));
         }
-
-        return redirect('customer-orders')->with(saveMessage());
-
-    } catch (\Exception $e) {
-
-        return redirect()->back()
-            ->withInput($request->all())
-            ->with(dangerMessage($e->getMessage()));
     }
-}
 
     /**
      * Display the specified resource.
@@ -234,21 +578,57 @@ class CustomerOrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    //     public function show($id)
+//     {
+//         $id = encrypt_decrypt($id, 'decrypt');
+//         // $customerOrder = CustomerOrder::find($id);
+//         $customerOrder = CustomerOrder::with('region')->find($id);
+
+    // if (!$customerOrder) {
+//     return redirect()->back()->with('error', 'Customer Order not found');
+// }
+//         $title = __('index.customer_order_details');
+
+    //         $orderDetails = CustomerOrderDetails::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->get();
+//         $orderInvoice = CustomerOrderInvoice::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->orderBy('id', 'desc')->get();
+//         $orderDeliveries = CustomerOrderDelivery::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->orderBy('id', 'desc')->get();
+//         $obj = $customerOrder;
+//         return view('pages.customer_order.view', compact('title', 'obj', 'orderDetails', 'orderInvoice', 'orderDeliveries'));
+//     }
+
+
     public function show($id)
     {
         $id = encrypt_decrypt($id, 'decrypt');
-        $customerOrder = CustomerOrder::find($id);
 
-if (!$customerOrder) {
-    return redirect()->back()->with('error', 'Customer Order not found');
-}
+        $customerOrder = CustomerOrder::with('region')->find($id);
+
+        if (!$customerOrder) {
+            return redirect()->back()->with('error', 'Customer Order not found');
+        }
+
         $title = __('index.customer_order_details');
 
-        $orderDetails = CustomerOrderDetails::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->get();
-        $orderInvoice = CustomerOrderInvoice::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->orderBy('id', 'desc')->get();
-        $orderDeliveries = CustomerOrderDelivery::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->orderBy('id', 'desc')->get();
+        $orderDetails = CustomerOrderDetails::where('customer_order_id', $customerOrder->id)
+            ->where('del_status', "Live")
+            ->get();
+
+        $orderInvoice = CustomerOrderInvoice::where('customer_order_id', $customerOrder->id)
+            ->where('del_status', "Live")
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $orderDeliveries = CustomerOrderDelivery::where('customer_order_id', $customerOrder->id)
+            ->where('del_status', "Live")
+            ->orderBy('id', 'desc')
+            ->get();
+
         $obj = $customerOrder;
-        return view('pages.customer_order.view', compact('title', 'obj', 'orderDetails', 'orderInvoice', 'orderDeliveries'));
+
+        return view(
+            'pages.customer_order.view',
+            compact('title', 'obj', 'orderDetails', 'orderInvoice', 'orderDeliveries')
+        );
     }
 
     /**
@@ -259,7 +639,8 @@ if (!$customerOrder) {
      */
     public function edit($id)
     {
-        $customerOrder = CustomerOrder::find(encrypt_decrypt($id, 'decrypt'));
+        // $customerOrder = CustomerOrder::find(encrypt_decrypt($id, 'decrypt'));
+        $customerOrder = CustomerOrder::with('region')->find(encrypt_decrypt($id, 'decrypt'));
         $title = __('index.edit_customer_order');
 
         $customers = Customer::orderBy('id', 'DESC')->where('del_status', "Live")->pluck('name', 'id');
@@ -274,10 +655,30 @@ if (!$customerOrder) {
         $orderInvoice = CustomerOrderInvoice::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->get();
         $orderDeliveries = CustomerOrderDelivery::where('customer_order_id', $customerOrder->id)->where('del_status', "Live")->orderBy('id', 'desc')->get();
         $regions = Region::where('status', 1)
-    ->orderBy('name', 'ASC')
-    ->pluck('name', 'id');
-        return view('pages.customer_order.edit', compact('title', 'product', 'customerOrder', 'customers', 'orderTypes', 'units', 'productList', 'orderDetails', 'orderInvoice', 'orderDeliveries','regions'));
+            ->orderBy('name', 'ASC')
+            ->pluck('name', 'id');
+
+        $categories = FPCategory::where('del_status', 'Live')
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        return view('pages.customer_order.edit', compact(
+            'title',
+            'product',
+            'customerOrder',
+            'customers',
+            'orderTypes',
+            'units',
+            'productList',
+            'orderDetails',
+            'orderInvoice',
+            'orderDeliveries',
+            'regions',
+            'categories'
+        ));
     }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -286,6 +687,95 @@ if (!$customerOrder) {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    //     public function update(Request $request, CustomerOrder $customerOrder)
+//     {
+//         request()->validate([
+//             'reference_no' => 'required|max:50',
+//             'customer_id' => 'required',
+//             'order_type' => 'required',
+//             'delivery_date' => 'required',
+//             'delivery_address' => 'required',
+//         ]);
+//         $productList = $request->get('product');
+
+    //         $customerOrder->reference_no = null_check(escape_output($request->get('reference_no')));
+//         $customerOrder->customer_id = null_check(escape_output($request->get('customer_id')));
+//         $customerOrder->order_type = escape_output($request->get('order_type'));
+//         $customerOrder->delivery_date = string_date_null_check(escape_output($request->get('delivery_date')));
+//         $customerOrder->delivery_address = escape_output($request->get('delivery_address'));
+//         $customerOrder->total_product = null_check(sizeof($productList));
+//         $customerOrder->total_amount = $request->filled('total_subtotal')
+//     ? floatval($request->total_subtotal)
+//     : 0;
+
+    // $customerOrder->total_cost = $request->filled('total_cost')
+//     ? floatval($request->total_cost)
+//     : 0;
+
+    // $customerOrder->total_profit = $request->filled('total_profit')
+//     ? floatval($request->total_profit)
+//     : 0;
+//         $customerOrder->quotation_note = escape_output($request->get('quotation_note'));
+//         $customerOrder->internal_note = escape_output($request->get('internal_note'));
+//         $customerOrder->save();
+
+    //         $last_id = $customerOrder->id;
+
+    //         //delete previous data before add
+//         CustomerOrderDetails::where('customer_order_id', $last_id)->update(['del_status' => "Deleted"]);
+//         CustomerOrderInvoice::where('customer_order_id', $last_id)->update(['del_status' => "Deleted"]);
+//         CustomerOrderDelivery::where('customer_order_id', $last_id)->update(['del_status' => "Deleted"]);
+
+    //         foreach ($productList as $row => $value) {
+//             $quantity = null_check(escape_output($_POST['quantity'][$row]));
+//             $cost_per_unit = null_check(escape_output($_POST['cost'][$row]));
+
+    //             $obj = new \App\CustomerOrderDetails();
+//             $obj->customer_order_id = $last_id;
+//             $obj->product_id = null_check(escape_output($_POST['product'][$row]));
+//             $obj->quantity = $quantity;
+//             $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row]));
+//             $obj->discount_percent = null_check(escape_output($_POST['discount_percent'][$row]));
+//             $obj->sub_total = null_check(escape_output($_POST['sub_total'][$row]));
+//             $obj->total_cost = $cost_per_unit * $quantity;
+//             $obj->profit = null_check(escape_output($_POST['profit'][$row]));
+//             $obj->delivery_date = string_date_null_check(escape_output($_POST['delivery_date_product'][$row]));
+//             $obj->production_status = escape_output($_POST['status'][$row]);
+//             $obj->delivered_qty = null_check(escape_output($_POST['delivered_qty'][$row]));
+
+    //             $obj->save();
+//         }
+//         if (!empty($request->invoice_type)) {
+//             foreach ($request->invoice_type as $key => $value) {
+//                 $inv_obj = new \App\CustomerOrderInvoice();
+//                 $inv_obj->customer_order_id = null_check($last_id);
+//                 $inv_obj->invoice_type = escape_output($request->invoice_type[$key]);
+//                 $inv_obj->amount = null_check($request->invoice_amount[$key]);
+//                 $inv_obj->invoice_date = escape_output($request->invoice_date[$key]);
+//                 $inv_obj->paid_amount = null_check($request->invoice_paid[$key]);
+//                 $inv_obj->due_amount = null_check($request->invoice_due[$key]);
+//                 $inv_obj->order_due_amount = null_check($request->invoice_order_due[$key]);
+//                 $inv_obj->save();
+//             }
+//         }
+//         if (!empty($request->delivaries_date)) {
+//             foreach ($request->delivaries_date as $key => $value) {
+//                 $del_obj = new \App\CustomerOrderDelivery();
+//                 $del_obj->customer_order_id = null_check($last_id);
+//                 $del_obj->product_id = null_check($request->delivaries_product[$key]);
+//                 $del_obj->quantity = null_check($request->delivaries_quantity[$key]);
+//                 $del_obj->delivery_date = escape_output($request->delivaries_date[$key]) ?? null;
+//                 $del_obj->delivery_note = escape_output($request->delivaries_note[$key]) ?? null;
+//                 $del_obj->delivery_status = escape_output($request->delivaries_status[$key]) ?? null;
+//                 $del_obj->save();
+//             }
+//         }
+
+    //         return redirect('customer-orders')->with(updateMessage());
+//     }
+
+
+
     public function update(Request $request, CustomerOrder $customerOrder)
     {
         request()->validate([
@@ -294,38 +784,106 @@ if (!$customerOrder) {
             'order_type' => 'required',
             'delivery_date' => 'required',
             'delivery_address' => 'required',
+
+            // New Fields
+            'order_date' => 'nullable|date',
+            'region_id' => 'nullable|exists:regions,id',
+            'business_type' => 'nullable|max:100',
+            'purpose' => 'nullable|max:255',
+            'product_service' => 'nullable|max:255',
+            'product_description' => 'nullable',
+            'handler_id' => 'nullable',
+            'total_quantity' => 'nullable|max:100',
+            'specifications' => 'nullable',
+            'sales_person_id' => 'nullable',
+            'dispatch_status' => 'nullable|max:50',
+            'expected_dispatch_date' => 'nullable|date',
+            'actual_dispatch_date' => 'nullable|date',
+            'delay_days' => 'nullable|integer',
+            'remarks' => 'nullable',
         ]);
+
         $productList = $request->get('product');
 
+        // Existing Fields
         $customerOrder->reference_no = null_check(escape_output($request->get('reference_no')));
         $customerOrder->customer_id = null_check(escape_output($request->get('customer_id')));
         $customerOrder->order_type = escape_output($request->get('order_type'));
-        $customerOrder->delivery_date = string_date_null_check(escape_output($request->get('delivery_date')));
+        $customerOrder->delivery_date = string_date_null_check(
+            escape_output($request->get('delivery_date'))
+        );
         $customerOrder->delivery_address = escape_output($request->get('delivery_address'));
         $customerOrder->total_product = null_check(sizeof($productList));
+
         $customerOrder->total_amount = $request->filled('total_subtotal')
-    ? floatval($request->total_subtotal)
-    : 0;
+            ? floatval($request->total_subtotal)
+            : 0;
 
-$customerOrder->total_cost = $request->filled('total_cost')
-    ? floatval($request->total_cost)
-    : 0;
+        $customerOrder->total_cost = $request->filled('total_cost')
+            ? floatval($request->total_cost)
+            : 0;
 
-$customerOrder->total_profit = $request->filled('total_profit')
-    ? floatval($request->total_profit)
-    : 0;
+        $customerOrder->total_profit = $request->filled('total_profit')
+            ? floatval($request->total_profit)
+            : 0;
+
         $customerOrder->quotation_note = escape_output($request->get('quotation_note'));
         $customerOrder->internal_note = escape_output($request->get('internal_note'));
+
+        // New Fields
+        $customerOrder->order_date = string_date_null_check(
+            escape_output($request->get('order_date'))
+        );
+
+        // Region dropdown from regions table
+        $customerOrder->region_id = null_check($request->get('region_id'));
+
+        $customerOrder->business_type = escape_output($request->get('business_type'));
+        $customerOrder->purpose = escape_output($request->get('purpose'));
+        $customerOrder->product_service = escape_output($request->get('product_service'));
+        $customerOrder->product_description = escape_output($request->get('product_description'));
+        $customerOrder->handler_id = null_check($request->get('handler_id'));
+        $customerOrder->quantity = escape_output($request->get('total_quantity'));
+        $customerOrder->specifications = escape_output($request->get('specifications'));
+        $customerOrder->sales_person_id = null_check($request->get('sales_person_id'));
+        $customerOrder->dispatch_status = escape_output($request->get('dispatch_status'));
+
+        $customerOrder->expected_dispatch_date = string_date_null_check(
+            escape_output($request->get('expected_dispatch_date'))
+        );
+
+        $customerOrder->actual_dispatch_date = string_date_null_check(
+            escape_output($request->get('actual_dispatch_date'))
+        );
+
+        $customerOrder->delay_days = null_check($request->get('delay_days'));
+        $customerOrder->remarks = escape_output($request->get('remarks'));
+
         $customerOrder->save();
 
         $last_id = $customerOrder->id;
 
-        //delete previous data before add
-        CustomerOrderDetails::where('customer_order_id', $last_id)->update(['del_status' => "Deleted"]);
-        CustomerOrderInvoice::where('customer_order_id', $last_id)->update(['del_status' => "Deleted"]);
-        CustomerOrderDelivery::where('customer_order_id', $last_id)->update(['del_status' => "Deleted"]);
+        /*
+        |-----------------------------------
+        | Delete previous records
+        |-----------------------------------
+        */
+        CustomerOrderDetails::where('customer_order_id', $last_id)
+            ->update(['del_status' => "Deleted"]);
 
+        CustomerOrderInvoice::where('customer_order_id', $last_id)
+            ->update(['del_status' => "Deleted"]);
+
+        CustomerOrderDelivery::where('customer_order_id', $last_id)
+            ->update(['del_status' => "Deleted"]);
+
+        /*
+        |-----------------------------------
+        | Product Details
+        |-----------------------------------
+        */
         foreach ($productList as $row => $value) {
+
             $quantity = null_check(escape_output($_POST['quantity'][$row]));
             $cost_per_unit = null_check(escape_output($_POST['cost'][$row]));
 
@@ -338,14 +896,23 @@ $customerOrder->total_profit = $request->filled('total_profit')
             $obj->sub_total = null_check(escape_output($_POST['sub_total'][$row]));
             $obj->total_cost = $cost_per_unit * $quantity;
             $obj->profit = null_check(escape_output($_POST['profit'][$row]));
-            $obj->delivery_date = string_date_null_check(escape_output($_POST['delivery_date_product'][$row]));
+            $obj->delivery_date = string_date_null_check(
+                escape_output($_POST['delivery_date_product'][$row])
+            );
             $obj->production_status = escape_output($_POST['status'][$row]);
             $obj->delivered_qty = null_check(escape_output($_POST['delivered_qty'][$row]));
 
             $obj->save();
         }
+
+        /*
+        |-----------------------------------
+        | Invoice
+        |-----------------------------------
+        */
         if (!empty($request->invoice_type)) {
             foreach ($request->invoice_type as $key => $value) {
+
                 $inv_obj = new \App\CustomerOrderInvoice();
                 $inv_obj->customer_order_id = null_check($last_id);
                 $inv_obj->invoice_type = escape_output($request->invoice_type[$key]);
@@ -354,18 +921,30 @@ $customerOrder->total_profit = $request->filled('total_profit')
                 $inv_obj->paid_amount = null_check($request->invoice_paid[$key]);
                 $inv_obj->due_amount = null_check($request->invoice_due[$key]);
                 $inv_obj->order_due_amount = null_check($request->invoice_order_due[$key]);
+
                 $inv_obj->save();
             }
         }
+
+        /*
+        |-----------------------------------
+        | Deliveries
+        |-----------------------------------
+        */
         if (!empty($request->delivaries_date)) {
             foreach ($request->delivaries_date as $key => $value) {
+
                 $del_obj = new \App\CustomerOrderDelivery();
                 $del_obj->customer_order_id = null_check($last_id);
                 $del_obj->product_id = null_check($request->delivaries_product[$key]);
                 $del_obj->quantity = null_check($request->delivaries_quantity[$key]);
-                $del_obj->delivery_date = escape_output($request->delivaries_date[$key]) ?? null;
+                $del_obj->delivery_date = string_date_null_check(
+                    escape_output($request->delivaries_date[$key])
+                );
+
                 $del_obj->delivery_note = escape_output($request->delivaries_note[$key]) ?? null;
                 $del_obj->delivery_status = escape_output($request->delivaries_status[$key]) ?? null;
+
                 $del_obj->save();
             }
         }

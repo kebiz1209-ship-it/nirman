@@ -35,8 +35,11 @@ class FPproductionstage extends Model
     /**
      * Get Finish Product Stages
      */
-    public function getFinishProductStages($fproduct_id){
-        $result = DB::select("SELECT * FROM tbl_finished_products_productionstage WHERE del_status='Live' AND finish_product_id='$fproduct_id'");
-        return $result;
-    }
+  public function getFinishProductStages($fproduct_id)
+{
+    return DB::table('tbl_finished_products_productionstage')
+        ->where('finish_product_id', $fproduct_id)
+        ->whereIn('del_status', ['Live', 'live', 'Active'])
+        ->get();
+}
 }

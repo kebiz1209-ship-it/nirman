@@ -1,19 +1,5 @@
 <?php
-/*
-##############################################################################
-# iProduction - Production and Manufacture Management Software
-##############################################################################
-# AUTHOR:		Door Soft
-##############################################################################
-# EMAIL:		info@doorsoft.co
-##############################################################################
-# COPYRIGHT:		RESERVED BY Door Soft
-##############################################################################
-# WEBSITE:		https://www.doorsoft.co
-##############################################################################
-# This is FinishedProductController
-##############################################################################
-*/
+
 
 namespace App\Http\Controllers;
 
@@ -77,88 +63,199 @@ class FinishedProductController extends Controller
     * @param  \Illuminate\Http\Request  $request
     * @return \Illuminate\Http\Response
     */
-    public function store(Request $request)
-    {
-        request()->validate([
-            'name' => 'required|max:150',
-            'code' => 'required|max:50',
-            'category' => 'required|max:50',
-            'unit' => 'required|max:50',
-            'stock_method' => 'required|max:50'
-        ]);
+   public function store(Request $request)
+{
+    request()->validate([
+        'name' => 'required|max:150',
+        'category' => 'required|max:50',
+        'unit' => 'required|max:50',
+        'stock_method' => 'required|max:50'
+    ]);
 
-        $obj = new \App\FinishedProduct;
-        $obj->code = escape_output($request->get('code'));
-        $obj->name = escape_output($request->get('name'));
-        $obj->category = null_check(escape_output($request->get('category')));
-        $obj->stock_method = escape_output($request->get('stock_method'));
-        $obj->unit = null_check(escape_output($request->get('unit')));
-        $obj->rmcost_total = null_check(escape_output($request->get('rmcost_total')));
-        $obj->noninitem_total = null_check(escape_output($request->get('noninitem_total')));
-        $obj->total_cost = null_check(escape_output($request->get('total_cost')));
-        $obj->profit_margin = null_check(escape_output($request->get('profit_margin')));
-        $obj->sale_price = null_check(escape_output($request->get('sale_price')));
-        $obj->company_id = auth()->user()->company_id;
+    // Generate product code based on category
+    $category = FPCategory::find($request->category);
 
-        //generate json data for tax value
-        $tax_information = array();
-        if(!empty($_POST['tax_field_percentage'])){
-            foreach($_POST['tax_field_percentage'] as $key=>$value){
-                $single_info = array(
-                    'tax_field_id' => escape_output($_POST['tax_field_id'][$key]),
-                    'tax_field_name' => escape_output($_POST['tax_field_name'][$key]),
-                    'tax_field_percentage' => ($_POST['tax_field_percentage'][$key] == "") ? 0 : escape_output($_POST['tax_field_percentage'][$key])
-                );
-                array_push($tax_information,$single_info);
-            }
+    if (!$category) {
+        return redirect()->back()->with('error', 'Invalid Category');
+    }
+
+    $categoryCode = $category->code; // Example: PC/01
+
+    // $productCount = FinishedProduct::where('category', $request->category)->count();
+    // $nextNumber = $productCount + 1;
+
+    // $productCode = $categoryCode . '/' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+    $lastProduct = FinishedProduct::where('category', $request->category)
+    ->orderBy('id', 'DESC')
+    ->first();
+
+$number = 1;
+
+if ($lastProduct && $lastProduct->code) {
+
+    preg_match('/FP(\d+)$/', $lastProduct->code, $matches);
+
+    if (isset($matches[1])) {
+        $number = (int)$matches[1] + 1;
+    }
+}
+
+$productCode = $categoryCode . '/FP' . str_pad($number, 2, '0', STR_PAD_LEFT);
+    // Example: PC/01/001
+
+
+    $obj = new \App\FinishedProduct;
+    $obj->code = $productCode;   // auto generated code
+    $obj->name = escape_output($request->get('name'));
+    $obj->category = null_check(escape_output($request->get('category')));
+    $obj->stock_method = escape_output($request->get('stock_method'));
+    $obj->unit = null_check(escape_output($request->get('unit')));
+    $obj->rmcost_total = null_check(escape_output($request->get('rmcost_total')));
+    $obj->noninitem_total = null_check(escape_output($request->get('noninitem_total')));
+    $obj->total_cost = null_check(escape_output($request->get('total_cost')));
+    $obj->profit_margin = null_check(escape_output($request->get('profit_margin')));
+    $obj->sale_price = null_check(escape_output($request->get('sale_price')));
+    $obj->potency = null_check(escape_output($request->get('potency')));
+$obj->grade = null_check(escape_output($request->get('grade')));
+$obj->description = null_check(escape_output($request->get('description')));
+$obj->hsn_code = null_check(escape_output($request->get('hsn_code')));
+$obj->gst = null_check(escape_output($request->get('gst')));
+    $obj->company_id = auth()->user()->company_id;
+
+    // Generate json data for tax value
+    $tax_information = array();
+    if (!empty($_POST['tax_field_percentage'])) {
+        foreach ($_POST['tax_field_percentage'] as $key => $value) {
+            $single_info = array(
+                'tax_field_id' => escape_output($_POST['tax_field_id'][$key]),
+                'tax_field_name' => escape_output($_POST['tax_field_name'][$key]),
+                'tax_field_percentage' => ($_POST['tax_field_percentage'][$key] == "") ? 0 : escape_output($_POST['tax_field_percentage'][$key])
+            );
+            array_push($tax_information, $single_info);
         }
-        $tax_information = json_encode($tax_information);
+    }
+    $tax_information = json_encode($tax_information);
 
-        $obj->tax_information = $tax_information;
-        $obj->added_by = auth()->user()->id;
+    $obj->tax_information = $tax_information;
+    $obj->added_by = auth()->user()->id;
+    $obj->save();
+    $last_id = $obj->id;
+
+$rm_id = $request->get('rm_id', []);
+
+if (!empty($rm_id) && is_array($rm_id)) {
+
+    foreach ($rm_id as $row => $value) {
+
+        if (empty($value)) {
+            continue;
+        }
+
+        $obj = new \App\FPrmitem;
+        $obj->rmaterials_id = null_check($value);
+        $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row] ?? 0));
+        $obj->consumption = null_check(escape_output($_POST['quantity_amount'][$row] ?? 0));
+        $obj->total_cost = null_check(escape_output($_POST['total'][$row] ?? 0));
+        $obj->finish_product_id = null_check($last_id);
+        $obj->company_id = auth()->user()->company_id;
         $obj->save();
-        $last_id = $obj->id;
+    }
+}
 
-        $rm_id = $request->get('rm_id');
-        foreach ($rm_id as $row=>$value){
-            $obj = new \App\FPrmitem;
-            $obj->rmaterials_id = null_check($value);
-            $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row]));
-            $obj->consumption = null_check(escape_output($_POST['quantity_amount'][$row]));
-            $obj->total_cost = null_check(escape_output($_POST['total'][$row]));
+    // Non inventory items
+    $noniitem_id = $request->get('noniitem_id');
+    if (isset($noniitem_id) && $noniitem_id) {
+        foreach ($noniitem_id as $row => $value) {
+            $obj = new \App\FPnonitem;
+            $obj->noninvemtory_id = null_check($value);
+            $obj->nin_cost = null_check(escape_output($_POST['total_1'][$row]));
             $obj->finish_product_id = null_check($last_id);
             $obj->company_id = auth()->user()->company_id;
             $obj->save();
         }
-
-        $noniitem_id = $request->get('noniitem_id');
-        if(isset($noniitem_id) && $noniitem_id){
-            foreach ($noniitem_id as $row=>$value){
-                $obj = new \App\FPnonitem;
-                $obj->noninvemtory_id = null_check($value);
-                $obj->nin_cost = null_check(escape_output($_POST['total_1'][$row]));
-                $obj->finish_product_id = null_check($last_id);
-                $obj->company_id = auth()->user()->company_id;
-                $obj->save();
-            }
-        }
-        $producstage_id = $request->get('producstage_id');
-        if(isset($producstage_id) && $producstage_id) {
-            foreach ($producstage_id as $row => $value) {
-                $obj = new \App\FPproductionstage();
-                $obj->productionstage_id = null_check($value);
-                $obj->stage_month = null_check(escape_output($_POST['stage_month'][$row]));
-                $obj->stage_day = null_check(escape_output($_POST['stage_day'][$row]));
-                $obj->stage_hours = null_check(escape_output($_POST['stage_hours'][$row]));
-                $obj->stage_minute = null_check(escape_output($_POST['stage_minute'][$row]));
-                $obj->finish_product_id = null_check($last_id);
-                $obj->company_id = auth()->user()->company_id;
-                $obj->save();
-            }
-        }
-        return redirect('finishedproducts')->with(saveMessage());
     }
 
+    // Production stages
+    $producstage_id = $request->get('producstage_id');
+    if (isset($producstage_id) && $producstage_id) {
+        foreach ($producstage_id as $row => $value) {
+            $obj = new \App\FPproductionstage();
+            $obj->productionstage_id = null_check($value);
+            $obj->stage_month = null_check(escape_output($_POST['stage_month'][$row]));
+            $obj->stage_day = null_check(escape_output($_POST['stage_day'][$row]));
+            $obj->stage_hours = null_check(escape_output($_POST['stage_hours'][$row]));
+            $obj->stage_minute = null_check(escape_output($_POST['stage_minute'][$row]));
+            $obj->finish_product_id = null_check($last_id);
+            $obj->company_id = auth()->user()->company_id;
+            $obj->save();
+        }
+    }
+
+    return redirect('finishedproducts')->with(saveMessage());
+}
+
+
+// public function getProductCode($category_id)
+// {
+//     $category = \App\FPCategory::find($category_id);
+
+//     if (!$category) {
+//         return response()->json(['code' => '']);
+//     }
+
+//     // Find last product in this category
+//     $lastProduct = \App\FinishedProduct::where('category', $category_id)
+//                     ->orderBy('id', 'DESC')
+//                     ->first();
+
+//     if ($lastProduct && $lastProduct->code) {
+//         preg_match('/FP(\d+)$/', $lastProduct->code, $matches);
+//         $number = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+//     } else {
+//         $number = 1;
+//     }
+
+//     $newCode = $category->code . '/FP' . str_pad($number, 2, '0', STR_PAD_LEFT);
+
+//     return response()->json([
+//         'code' => $newCode
+//     ]);
+// }
+
+
+public function getProductCode($category_id)
+{
+    $category = FPCategory::find($category_id);
+
+    if (!$category) {
+        return response()->json([
+            'code' => ''
+        ]);
+    }
+
+    // Last product of this category
+    $lastProduct = FinishedProduct::where('category', $category_id)
+        ->orderBy('id', 'DESC')
+        ->first();
+
+    $number = 1;
+
+    if ($lastProduct && $lastProduct->code) {
+
+        preg_match('/FP(\d+)$/', $lastProduct->code, $matches);
+
+        if (isset($matches[1])) {
+            $number = (int)$matches[1] + 1;
+        }
+    }
+
+    $newCode = $category->code . '/FP' . str_pad($number, 2, '0', STR_PAD_LEFT);
+
+    return response()->json([
+        'code' => $newCode
+    ]);
+}
     /**
     * Display the specified resource.
     *
@@ -253,6 +350,11 @@ class FinishedProductController extends Controller
         $obj->total_cost = null_check(escape_output($request->get('total_cost')));
         $obj->profit_margin = null_check(escape_output($request->get('profit_margin')));
         $obj->sale_price = null_check(escape_output($request->get('sale_price')));
+        $obj->potency = null_check(escape_output($request->get('potency')));
+        $obj->grade = null_check(escape_output($request->get('grade')));
+        $obj->description = null_check(escape_output($request->get('description')));
+        $obj->hsn_code = null_check(escape_output($request->get('hsn_code')));
+        $obj->gst = null_check(escape_output($request->get('gst')));
         $obj->company_id = auth()->user()->company_id;
 
         //generate json data for tax value
@@ -338,7 +440,12 @@ class FinishedProductController extends Controller
         $finishedproduct->total_cost = null_check(escape_output($request->get('total_cost')));
         $finishedproduct->profit_margin = null_check(escape_output($request->get('profit_margin')));
         $finishedproduct->sale_price = null_check(escape_output($request->get('sale_price')));
-        $finishedproduct->company_id = auth()->user()->company_id;
+        $finishedproduct->potency = null_check(escape_output($request->get('potency')));
+        $finishedproduct->grade = null_check(escape_output($request->get('grade')));
+        $finishedproduct->description = null_check(escape_output($request->get('description')));
+        $finishedproduct->hsn_code = null_check(escape_output($request->get('hsn_code')));
+        $finishedproduct->gst = null_check(escape_output($request->get('gst')));
+                $finishedproduct->company_id = auth()->user()->company_id;
 
         //generate json data for tax value
         $tax_information = array();
@@ -378,19 +485,28 @@ class FinishedProductController extends Controller
         FPnonitem::where('finish_product_id', $finishedproduct->id)->update(['del_status' => "Deleted"]);
         FPproductionstage::where('finish_product_id', $finishedproduct->id)->update(['del_status' => "Deleted"]);
 
-        $rm_id = $request->get('rm_id');
-        if($rm_id){
-            foreach ($rm_id as $row=>$value){
-                $obj = new \App\FPrmitem;
-                $obj->rmaterials_id = null_check($value);
-                $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row]));
-                $obj->consumption = null_check(escape_output($_POST['quantity_amount'][$row]));
-                $obj->total_cost = null_check(escape_output($_POST['total'][$row]));
-                $obj->finish_product_id = null_check($last_id);
-                $obj->company_id = auth()->user()->company_id;
-                $obj->save();
-            }
+        // Raw materials (nullable safe)
+// Raw materials (FULLY OPTIONAL SAFE)
+$rm_id = $request->get('rm_id', []);
+
+if (!empty($rm_id) && is_array($rm_id)) {
+
+    foreach ($rm_id as $row => $value) {
+
+        if (empty($value)) {
+            continue;
         }
+
+        $obj = new \App\FPrmitem;
+        $obj->rmaterials_id = null_check($value);
+        $obj->unit_price = null_check(escape_output($_POST['unit_price'][$row] ?? 0));
+        $obj->consumption = null_check(escape_output($_POST['quantity_amount'][$row] ?? 0));
+        $obj->total_cost = null_check(escape_output($_POST['total'][$row] ?? 0));
+        $obj->finish_product_id = null_check($last_id);
+        $obj->company_id = auth()->user()->company_id;
+        $obj->save();
+    }
+}
         $noniitem_id = $request->get('noniitem_id');
         if($noniitem_id){
             foreach ($noniitem_id as $row=>$value){

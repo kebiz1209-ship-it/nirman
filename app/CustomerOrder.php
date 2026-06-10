@@ -43,6 +43,11 @@ class CustomerOrder extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
+    public function region()
+{
+    return $this->belongsTo(\App\Region::class, 'region_id');
+}
+
     /**
      * Customer Order Details Relationship
      */

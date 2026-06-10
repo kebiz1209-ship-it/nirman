@@ -1,19 +1,5 @@
 <?php
-/*
-  ##############################################################################
-  # iProduction - Production and Manufacture Management
-  ##############################################################################
-  # AUTHOR:		Door Soft
-  ##############################################################################
-  # EMAIL:		info@doorsoft.co
-  ##############################################################################
-  # COPYRIGHT:		RESERVED BY Door Soft
-  ##############################################################################
-  # WEBSITE:		https://www.doorsoft.co
-  ##############################################################################
-  # This is FinishedProduct Model
-  ##############################################################################
- */
+
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
@@ -129,4 +115,9 @@ class FinishedProduct extends Model
     {
         return $this->hasMany(Manufacture::class, 'product_id')->where('del_status', 'Live');
     }
+
+    public function categoryDetails()
+{
+    return $this->belongsTo(FPCategory::class, 'category', 'id');
+}
 }

@@ -50,6 +50,19 @@ use Illuminate\Support\Facades\URL;
 /**
  * Base Url
  */
+
+
+
+if (!function_exists('grayMessage')) {
+    function grayMessage($message): array
+    {
+        return [
+            'type' => 'secondary',
+            'message' => $message,
+            'sign' => 'info-circle',
+        ];
+    }
+}
 function getBaseURL()
 {
     return URL::to('/') . '/';

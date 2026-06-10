@@ -118,9 +118,9 @@ $(document).ready(function () {
                 '<td><input type="text" id="delivery_date_' +
                 i +
                 '" name="delivery_date_product[]" class="form-control customDatepicker" placeholder="Delivery Date"></td>' +
-                '<td class="text-center align-middle"><span id="production_status_' +
+                '<td><select name="status[]" id="fstatus_id_' +
                 i +
-                '">N/A</span></td>' +
+                '" class="form-control fstatus_id select2"><option value="none">N/A</option></select></td>' +
                 '<td class="align-middle"><span id="deliveries_qty_' +
                 i +
                 '">0</span></td>' +
@@ -164,10 +164,111 @@ $(document).ready(function () {
                 $("#cost_" + c_id).val(data.total_cost);
 
                 $(".rmcurrency").html(default_currency);
+                // Fetch production stages for this finish product and populate the status select
+                $.ajax({
+                    type: "POST",
+                    url: hidden_base_url + "getFinishProductStages",
+                    data: { id: fproduct_id },
+                    dataType: "json",
+                    // success: function (resp) {
+                    //     console.log('getFinishProductStages response:', resp);
+                    //     // Controller returns { html: '...', total_month:..., ... }
+                    //     let html = resp.html || resp;
+                    //     let $tmp = $("<div>").html(html);
+                    //     let $rows = $tmp.find('tr.rowCount2');
+                    //     let $select = $("#fstatus_id_" + c_id);
+                    //     if ($select.length) {
+                    //         $select.empty();
+                    //         if ($rows.length) {
+                    //             $select.append('<option value="none">Please Select</option>');
+                    //             $rows.each(function () {
+                    //                 let prodId = $(this).find('input[name="producstage_id[]"]').val();
+                    //                 let stageName = $(this).find('.stage_name span').text().trim();
+                    //                 if (prodId) {
+                    //                     $select.append('<option value="' + prodId + '">' + stageName + '</option>');
+                    //                 }
+                    //             });
+                    //         } else {
+                    //             $select.append('<option value="none">N/A</option>');
+                    //         }
+                    //         try {
+                    //             $select.select2({ dropdownParent: $(document.body) });
+                    //         } catch (e) {
+                    //             // select2 may not be initialized yet
+                    //         }
+                    //     }
+                    // },
+                    success: function (resp) {
+    console.log('getFinishProductStages response:', resp);
+
+    let html = resp.html || resp;
+    let $tmp = $("<div>").html(html);
+    let $rows = $tmp.find('tr.rowCount2');
+    let $select = $("#fstatus_id_" + c_id);
+    let $statusSpan = $("#production_status_" + c_id);   // add this
+
+    if ($select.length) {
+        $select.empty();
+
+        if ($rows.length) {
+            $select.append('<option value="">Please Select</option>');
+
+            let firstStageName = '';
+
+            $rows.each(function (index) {
+                let prodId = $(this).find('input[name="producstage_id[]"]').val();
+                let stageName = $(this).find('.stage_name span').text().trim();
+
+                if (prodId) {
+                    $select.append(
+                        '<option value="' + prodId + '">' + stageName + '</option>'
+                    );
+
+                    if (index === 0) {
+                        firstStageName = stageName;
+                    }
+                }
+            });
+
+            // update Production Status text
+            if ($statusSpan.length) {
+                $statusSpan.text(firstStageName || 'Please Select');
+            }
+
+        } else {
+            $select.append('<option value="none">N/A</option>');
+
+            if ($statusSpan.length) {
+                $statusSpan.text('N/A');
+            }
+        }
+
+        try {
+            $select.select2({ dropdownParent: $(document.body) });
+        } catch (e) {}
+    }
+},
+                    
+                    
+                    error: function () {
+                        // leave default
+                    },
+                });
             },
             error: function () {},
         });
     });
+
+
+    $(document).on("change", ".fstatus_id", function () {
+    let stageText = $(this).find("option:selected").text();
+
+    let fieldId = this.id;           // fstatus_id_1
+    let parts = fieldId.split("_");
+    let c_id = parts[2];
+
+    $("#production_status_" + c_id).text(stageText || "N/A");
+});
 
     $(document).on("keydown", ".quantity_c", function (e) {
         let keys = e.charCode || e.keyCode || 0;
@@ -196,14 +297,21 @@ $(document).ready(function () {
         let cost = Number($("#cost_" + c_id).val());
 
         let sub_total = quantity * unit_price;
-
         let total_cost = quantity * cost;
 
-        let profit = sub_total - total_cost;
-        console.log("profit = " + profit);
+        // Apply any existing discount percent
+        let discount_percent = Number($("#discount_percent_" + c_id).val());
+        let discountAmount = 0;
+        if (discount_percent) {
+            discountAmount = sub_total * (discount_percent / 100);
+        }
 
-        $("#sub_total_" + c_id).val(sub_total);
-        $("#profit_" + c_id).val(profit);
+        let discounted_sub_total = sub_total - discountAmount;
+
+        let profit = discounted_sub_total - total_cost;
+
+        $("#sub_total_" + c_id).val(discounted_sub_total.toFixed(2));
+        $("#profit_" + c_id).val(profit.toFixed(2));
 
         cal_row();
     });
@@ -218,15 +326,20 @@ $(document).ready(function () {
         let quantity = Number($("#quantity_" + c_id).val());
         let cost = Number($("#cost_" + c_id).val());
 
-        let sub_total = Number($("#sub_total_" + c_id).val());
+        // Calculate base subtotal (quantity * unit_price)
+        let unit_price = Number($("#unit_price_" + c_id).val());
+        let base_sub_total = quantity * unit_price;
+        let productDiscountAmount = 0;
+        if (discount_percent) {
+            productDiscountAmount = base_sub_total * (discount_percent / 100);
+        }
+
+        let discounted_sub_total = base_sub_total - productDiscountAmount;
         let total_cost = quantity * cost;
+        let profit = discounted_sub_total - total_cost;
 
-        let productDiscountAmount =
-            sub_total * (parseFloat($.trim(discount_percent)) / 100);
-
-        let profit = sub_total - total_cost - productDiscountAmount;
-
-        $("#profit_" + c_id).val(profit);
+        $("#sub_total_" + c_id).val(discounted_sub_total.toFixed(2));
+        $("#profit_" + c_id).val(profit.toFixed(2));
 
         cal_row();
     });
@@ -936,4 +1049,48 @@ $(document).ready(function () {
         closestDiv.text(message);
         closestDiv.removeClass("d-none");
     }
+});
+
+
+
+
+
+
+$(document).on("change", "#product_id", function () {
+    let product_id = $(this).val();
+    let hidden_base_url = $("#hidden_base_url").val();
+
+    $.ajax({
+        type: "POST",
+        url: hidden_base_url + "getFinishProductStages",
+        data: { id: product_id },
+        dataType: "json",
+        success: function (resp) {
+            let html = resp.html || resp;
+            let $tmp = $("<div>").html(html);
+            let $rows = $tmp.find("tr.rowCount2");
+            let $select = $("#delivery_status");
+
+            $select.empty();
+
+            if ($rows.length) {
+                $select.append('<option value="">Please Select</option>');
+
+                $rows.each(function () {
+                    let prodId = $(this).find('input[name="producstage_id[]"]').val();
+                    let stageName = $(this).find(".stage_name span").text().trim();
+
+                    if (prodId) {
+                        $select.append(
+                            '<option value="' + prodId + '">' + stageName + "</option>"
+                        );
+                    }
+                });
+            } else {
+                $select.append('<option value="none">N/A</option>');
+            }
+
+            $select.trigger("change");
+        }
+    });
 });

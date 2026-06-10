@@ -30,4 +30,10 @@ class FPCategory extends Model
     protected $fillable = [
         'id','name','description','del_status'
     ];
+
+
+    public function products()
+{
+    return $this->hasMany(FinishedProduct::class, 'category', 'id');
+}
 }

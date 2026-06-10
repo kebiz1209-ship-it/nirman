@@ -207,7 +207,7 @@
 
 
                     {{-- ADD ORDER --}}
-                    <!-- @if (routePermission('order.create'))
+                    @if (routePermission('order.create'))
 
                     <li class="menu_assign_class
             {{ request()->routeIs('customer-orders.create') ? ' treeMenuActive' : '' }}" data-menu__cid="irp_10">
@@ -218,7 +218,7 @@
 
                     </li>
 
-                    @endif -->
+                    @endif
 
 
                     {{-- ORDER LIST --}}

@@ -52,7 +52,7 @@ class ProductionController extends Controller
         $batch_no   = request()->get('batch_no');
         $customer   = request()->get('customer');
 
-        $obj = Manufacture::orderBy('id', 'DESC')
+       $obj = Manufacture::orderBy('created_at', 'DESC')
             ->status($status)
             ->product($product_id)
             ->batchNo($batch_no)
@@ -65,12 +65,6 @@ class ProductionController extends Controller
         return view('pages.manufacture.manufactures', compact('title', 'obj', 'finishProduct', 'customers', 'status', 'product_id', 'batch_no', 'customer'));
     }
 
-
-
-    public function dashboard()
-{
-    return view('pages.manufacture.dashboard');
-}
     /**
      * Show the form for creating a new resource.
      *
@@ -111,6 +105,7 @@ class ProductionController extends Controller
             'product_quantity'   => 'required|max:50',
             'start_date_m'       => 'required',
             'complete_date_m'    => 'required_if:manufacture_status,done',
+            'expiry_days'        => 'required_unless:manufacture_type,none,batchcontrol,fifo|numeric|min:1', 
             'file_button.*'      => 'max:5120|mimes:jpeg,jpg,png,gif,doc,docx,pdf,txt',
         ]);
 
@@ -125,7 +120,8 @@ class ProductionController extends Controller
             $obj->product_id         = null_check(escape_output($p_id[0]));
             $obj->product_quantity   = null_check(escape_output($request->get('product_quantity')));
             $obj->batch_no           = null_check(escape_output($request->get('batch_no')));
-            $obj->expiry_days        = null_check(escape_output($request->get('expiry_days')));
+            // $obj->expiry_days        = null_check(escape_output($request->get('expiry_days')));
+            $obj->expiry_days = $request->expiry_days ?? 0;
             $obj->start_date         = escape_output($request->get('start_date_m'));
             $obj->complete_date      = escape_output($request->get('complete_date_m')) ?? null;
             $obj->mrmcost_total      = null_check(escape_output($request->get('mrmcost_total')));
@@ -230,7 +226,7 @@ class ProductionController extends Controller
                 }
             }
 
-            $str_consumed_time = "Month(s): " . $total_months . " Day(s): " . $total_days . " Hour(s): " . $total_hours . " Min.(s) :" . $total_minutes;
+            $str_consumed_time = "Month: " . $total_months . " Day: " . $total_days . " Hour: " . $total_hours . " Min :" . $total_minutes;
 
             //update for consumed time
             $obj                = Manufacture::find($last_id);
@@ -370,7 +366,10 @@ class ProductionController extends Controller
         $manufacture->reference_no       = null_check(escape_output($request->get('reference_no')));
         $manufacture->manufacture_type   = escape_output($request->get('manufacture_type'));
         $manufacture->manufacture_status = escape_output($request->get('manufacture_status'));
-        $manufacture->product_id         = null_check(escape_output($request->get('product_id')));
+       $product_id = $request->get('product_id');
+$p_id = explode('|', $product_id);
+
+$manufacture->product_id = null_check(escape_output($p_id[0]));
         $manufacture->product_quantity   = null_check(escape_output($request->get('product_quantity')));
         $manufacture->batch_no           = null_check(escape_output($request->get('batch_no')));
         $manufacture->expiry_days        = null_check(escape_output($request->get('expiry_days')));
@@ -432,7 +431,8 @@ class ProductionController extends Controller
         $rm_id = $request->get('rm_id');
         foreach ($rm_id as $row => $value) {
             $obj                 = new \App\Mrmitem();
-            $obj->rmaterials_id  = null_check($value);
+            $rmId = explode('|', $value);
+$obj->rmaterials_id = null_check($rmId[0]);
             $obj->unit_price     = null_check(escape_output($_POST['unit_price'][$row]));
             $obj->consumption    = null_check(escape_output($_POST['quantity_amount'][$row]));
             $obj->total_cost     = null_check(escape_output($_POST['total'][$row]));
@@ -483,32 +483,78 @@ class ProductionController extends Controller
             }
         }
 
-        $str_consumed_time = "Month(s): " . $total_months . " Day(s): " . $total_days . " Hour(s): " . $total_hours . " Min.(s) :" . $total_minutes;
+        $str_consumed_time = "Month: " . $total_months . " Day: " . $total_days . " Hour: " . $total_hours . " Min :" . $total_minutes;
 
         //update for consumed time
         $obj                = Manufacture::find($last_id);
         $obj->consumed_time = $str_consumed_time;
         $obj->save();
 
-        $previous_status = $request->previous_status;
-        if ($previous_status == 'done') {
-            if ($obj->manufacture_status == 'inProgress' || $obj->manufacture_status == 'draft') {
-                $finishedProduct                      = FinishedProduct::findOrFail($obj->product_id);
-                $newStock                             = $finishedProduct->current_total_stock - $obj->product_quantity;
-                $finishedProduct->current_total_stock = $newStock;
-                $finishedProduct->save();
-            }
-        }
+       /*
+|--------------------------------------------------------------------------
+| STOCK MANAGEMENT FIX
+|--------------------------------------------------------------------------
+*/
 
-        //update finish product stock for done
-        if ($obj->manufacture_status == 'done') {
-            $finishedProduct = FinishedProduct::findOrFail($obj->product_id);
+$previous_status = $request->previous_status;
 
-            $newStock = $finishedProduct->current_total_stock + $obj->product_quantity;
+$finishedProduct = FinishedProduct::findOrFail($obj->product_id);
 
-            $finishedProduct->current_total_stock = $newStock;
-            $finishedProduct->save();
-        }
+$totalQty = (float) $obj->product_quantity;
+
+// already added through partial done
+$alreadyProducedQty = (float) $obj->partially_done_quantity;
+
+// remaining quantity not yet added
+$remainingQty = $totalQty - $alreadyProducedQty;
+
+
+/*
+|--------------------------------------------------------------------------
+| CASE 1:
+| Previously DONE -> now changed back to Draft/In Progress
+|--------------------------------------------------------------------------
+*/
+if (
+    $previous_status == 'done' &&
+    ($obj->manufacture_status == 'inProgress' ||
+     $obj->manufacture_status == 'draft')
+) {
+
+    // remove all produced stock
+    $finishedProduct->current_total_stock -= $totalQty;
+
+    // reset produced quantity
+    $obj->partially_done_quantity = 0;
+
+    $finishedProduct->save();
+    $obj->save();
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| CASE 2:
+| In Progress/Draft -> DONE
+|--------------------------------------------------------------------------
+*/
+if (
+    $previous_status != 'done' &&
+    $obj->manufacture_status == 'done'
+) {
+
+    // add ONLY remaining quantity
+    if ($remainingQty > 0) {
+
+        $finishedProduct->current_total_stock += $remainingQty;
+
+        // mark fully completed
+        $obj->partially_done_quantity = $totalQty;
+
+        $finishedProduct->save();
+        $obj->save();
+    }
+}
 
         return redirect('productions')->with(updateMessage());
     }
@@ -600,15 +646,20 @@ class ProductionController extends Controller
         $last_id = $obj->id;
 
         $rm_id = $request->get('rm_id');
-        foreach ($rm_id as $row => $value) {
-            $obj                 = new \App\Mrmitem();
-            $obj->rmaterials_id  = null_check($value);
-            $obj->unit_price     = null_check(escape_output($_POST['unit_price'][$row]));
-            $obj->consumption    = null_check(escape_output($_POST['quantity_amount'][$row]));
-            $obj->total_cost     = null_check(escape_output($_POST['total'][$row]));
-            $obj->manufacture_id = null_check($last_id);
-            $obj->save();
-        }
+
+foreach ($rm_id as $row => $value) {
+
+    $rmId = explode('|', $value);
+
+    $obj                 = new \App\Mrmitem();
+    $obj->rmaterials_id  = null_check($rmId[0]);
+    $obj->unit_price     = null_check(escape_output($_POST['unit_price'][$row]));
+    $obj->consumption    = null_check(escape_output($_POST['quantity_amount'][$row]));
+    $obj->total_cost     = null_check(escape_output($_POST['total'][$row]));
+    $obj->manufacture_id = null_check($last_id);
+
+    $obj->save();
+}
         $noniitem_id = $request->get('noniitem_id');
         if (isset($noniitem_id) && $noniitem_id) {
             foreach ($noniitem_id as $row => $value) {
@@ -670,7 +721,7 @@ class ProductionController extends Controller
             }
         }
 
-        $str_consumed_time = "Month(s): " . $total_months . " Day(s): " . $total_days . " Hour(s): " . $total_hours . " Min.(s) :" . $total_minutes;
+        $str_consumed_time = "Month: " . $total_months . " Day: " . $total_days . " Hour: " . $total_hours . " Min :" . $total_minutes;
 
         //update for consumed time
         $obj                = Manufacture::find($last_id);
@@ -699,45 +750,45 @@ class ProductionController extends Controller
         return redirect('productions')->with(deleteMessage());
     }
 
-    /**
-     * Partillay Done the specified resource from storage.
-     */
 
     public function changePartiallyDone(Request $request)
-    {
-        $manufacture             = Manufacture::find($request->manufacture_id);
-        $total_quantity          = $manufacture->product_quantity;
-        $partially_done_quantity = $manufacture->partially_done_quantity;
-        $remaining_quantity      = $total_quantity - $partially_done_quantity;
+{
+    $manufacture = Manufacture::find($request->manufacture_id);
 
-        $input_partially_done_quantity = $request->partially_done_quantity;
-        if ($input_partially_done_quantity > $remaining_quantity) {
-            return redirect('productions')->with(dangerMessage(__('index.partially_done_quantity_cannot_greater')));
-        }
+    $total_quantity = (float) $manufacture->product_quantity;
 
-        $manufacture->partially_done_quantity += $input_partially_done_quantity;
-        $manufacture->save();
+    $partially_done_quantity = (float) $manufacture->partially_done_quantity;
 
-        if ($manufacture->product_quantity == $manufacture->partially_done_quantity) {
-            $manufacture->manufacture_status = 'done';
-            $manufacture->save();
-        }
+    $remaining_quantity = $total_quantity - $partially_done_quantity;
 
-        if ($manufacture->manufacture_status == 'done') {
-            $finishedProduct = FinishedProduct::findOrFail($manufacture->product_id);
+    $input_partially_done_quantity = (float) $request->partially_done_quantity;
 
-            $newStock = $finishedProduct->current_total_stock + $input_partially_done_quantity;
+    if ($input_partially_done_quantity > $remaining_quantity) {
 
-            $finishedProduct->current_total_stock = $newStock;
-            $finishedProduct->save();
-        }
-
-        return redirect('productions')->with(updateMessage());
+        return redirect('productions')
+            ->with(dangerMessage(__('index.partially_done_quantity_cannot_greater')));
     }
 
-    /**
-     * updateProducedQuantityData
-     */
+
+    $manufacture->partially_done_quantity += $input_partially_done_quantity;
+
+    if ($manufacture->partially_done_quantity >= $manufacture->product_quantity) {
+
+        $manufacture->manufacture_status = 'done';
+    }
+
+    $manufacture->save();
+
+
+    $finishedProduct = FinishedProduct::findOrFail($manufacture->product_id);
+
+    $finishedProduct->current_total_stock += $input_partially_done_quantity;
+
+    $finishedProduct->save();
+
+    return redirect('productions')->with(updateMessage());
+}
+
 
     public function updateProducedQuantityData(Request $request)
     {
@@ -799,4 +850,80 @@ class ProductionController extends Controller
 
         return response()->json($productionScheduling);
     }
+
+
+
+public function getFinishProductStages(Request $request)
+{
+    try {
+
+        $id = $request->id;
+
+        $data = DB::table('tbl_finished_products_productionstage')
+            ->where('del_status', 'Live')
+            ->where('finish_product_id', $id)
+            ->get();
+
+        return response()->json($data);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getFinishProductRManufacture(Request $request)
+{
+    $id = $request->id;
+    $value = $request->value;
+
+    $obj2 = new \App\FPrmitem();
+    $finishProductRM = $obj2->getFinishProductRM($id);
+    $data = [];
+    if ($finishProductRM) {
+        foreach ($finishProductRM as $item) {
+            $consumption = isset($item->consumption) ? ($item->consumption * $value) : 0;
+            $data[] = [
+                'raw_material_id' => $item->rmaterials_id,
+                'rm_name' => getRMName($item->rmaterials_id),
+                'unit_price' => $item->unit_price,
+                'consumption' => $consumption,
+                'total_cost' => $item->total_cost,
+                'unit' => getManufactureUnitByRMID($item->rmaterials_id),
+            ];
+        }
+    }
+
+    return response()->json([
+        'status' => true,
+        'data' => $data,
+    ]);
+}
+
+public function getFinishProductNONI(Request $request)
+{
+    $id = $request->id;
+    $value = $request->value;
+
+    $obj2 = new \App\FPnonitem();
+    $finishProductNoni = $obj2->getFinishProductNONI($id);
+    $data = [];
+    if ($finishProductNoni) {
+        foreach ($finishProductNoni as $item) {
+            $cost = isset($item->nin_cost) ? ($item->nin_cost * $value) : 0;
+            $data[] = [
+                'noninventory_item_id' => $item->noninvemtory_id,
+                'noni_name' => getNonInventroyItem($item->noninvemtory_id),
+                'cost' => $cost,
+            ];
+        }
+    }
+
+    return response()->json([
+        'status' => true,
+        'data' => $data,
+    ]);
+}
 }

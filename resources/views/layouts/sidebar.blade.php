@@ -66,6 +66,48 @@
                 </a>
             </li>
             @endif
+
+
+
+            <!-- kashish menuu -->
+
+
+            <li class="parent-menu treeview2 {{ request()->is('demo-page*') ? 'menu-open active_sub_menu' : '' }}">
+
+                <a href="{{ route('demo.page') }}">
+
+                    <iconify-icon icon="solar:widget-2-broken"></iconify-icon>
+
+                    <span class="match_bold">
+                        Demo Page
+                    </span>
+
+                </a>
+
+            </li>
+
+            <!-- <li class="parent-menu treeview2 {{ request()->is('products*') ? 'menu-open active_sub_menu' : '' }}">
+
+                <a href="{{ route('products.index') }}">
+
+                    <iconify-icon icon="solar:widget-2-broken"></iconify-icon>
+
+                    <span class="match_bold">
+                        Finish product
+                    </span>
+
+                </a>
+
+            </li> -->
+             <!-- @if (routePermission('product.index'))
+                    <li class="menu_assign_class {{ request()->routeIs('finishedproducts.index') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10"><a
+                            href="{{ route('finishedproducts.index') }}">@lang('index.list_product')</a>
+                    </li>
+                    @endif -->
+
+
+            <!-- end -->
             @if (menuPermission('Item Setup'))
             <li
                 class="parent-menu treeview menu__cidirp_10{{ request()->is('rmcategories*') || request()->is('rawmaterials*') || request()->is('noninventoryitems*') || request()->is('fpcategories*') || request()->is('finishedproducts*') ? ' menu-open active_sub_menu' : '' }}">
@@ -541,10 +583,10 @@
                     <iconify-icon icon="solar:stopwatch-broken"></iconify-icon>
                     <span class="match_bold">@lang('index.attendance')</span>
                 </a> -->
-                 <a href="javascript:void(0);" class="disabled-menu">
-        <iconify-icon icon="solar:stopwatch-broken"></iconify-icon>
-        <span class="match_bold">@lang('index.attendance')</span>
-    </a>
+                <a href="javascript:void(0);" class="disabled-menu">
+                    <iconify-icon icon="solar:stopwatch-broken"></iconify-icon>
+                    <span class="match_bold">@lang('index.attendance')</span>
+                </a>
 
                 <ul class="treeview-menu">
                     @if (routePermission('attendance.create'))

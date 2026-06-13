@@ -12,17 +12,22 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SalePerson\DashboardsController;
+use App\Http\Controllers\SalePerson\OrdersController;
+use App\Http\Controllers\SalePerson\PaymentsController;
+use App\Http\Controllers\SalePerson\CustomerController;
+use App\Http\Controllers\SalePerson\EnquiryController;
+use App\Http\Controllers\SalePerson\FollowUpController;
+use App\Http\Controllers\SalePerson\FeedbackController;
+use App\Http\Controllers\SalePerson\SampleController;
+use App\Http\Controllers\SalePerson\ReportController;
+use App\Http\Controllers\ProductHead\PDashboardController;
+use App\Http\Controllers\Production\ODashboardController;
+use App\Http\Controllers\Qc\QDashboardController;
+use App\Http\Controllers\Dispatch\DDashboardController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
- */
 
 Route::get('clear-all', function () {
     \Illuminate\Support\Facades\Artisan::call('view:clear');
@@ -152,6 +157,25 @@ Route::group(['middleware' => ['XSS']], function () {
 
         // Role Controller
         Route::resource('role', RoleController::class);
+
+
+        // kashish routes 
+        Route::resource('products', ProductController::class);
+        Route::resource('orders', OrderController::class);
+        Route::get('/demo-page', function () {
+            return view('pages.demo-page');
+            })->name('demo.page');
+
+        Route::get('/sales/dashboard', [DashboardsController::class, 'dashboard'])
+        ->name('pages.sales.dashboard');
+
+        Route::get('/get-product-formula/{id}', [App\Http\Controllers\CustomerOrdersController::class, 'getProductFormula']);
+        Route::post('/save-product-formula', [App\Http\Controllers\CustomerOrdersController::class, 'saveProductFormula']);
+
+// Place this inside your authenticated route group
+Route::get('/get-products/{category_id}', [App\Http\Controllers\CustomerOrdersController::class, 'getProducts']);
+
+
 
 Route::resource('menu', MenuController::class);
 
@@ -420,37 +444,103 @@ Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
             // Finished Product Controller
             Route::get('product-price-history', [App\Http\Controllers\FinishedProductController::class, 'priceHistory'])->name('product.price.history');
 
+            // Get ALL products (for dropdown list)
+            Route::get('/get-all-products', [App\Http\Controllers\FinishedProductController::class, 'getAllProducts']);
+
+            // Get products by category
+            Route::get('/get-products-by-category/{category_id}', [App\Http\Controllers\FinishedProductController::class, 'getProductsByCategory']);
+
+            // Get product code by category
+            Route::get('/get-product-code/{category_id}', [App\Http\Controllers\FinishedProductController::class, 'getProductCode']);
+
+
+             Route::get('/purchase-dashboard', [App\Http\Controllers\RawMaterialPurchaseController::class, 'dashboard'])
+                ->name('purchase.dashboard');
+
+            Route::get('/production-dashboard', [App\Http\Controllers\ProductionController::class, 'dashboard'])
+                ->name('production.dashboard');
+
+            Route::get('/stock-dashboard', [App\Http\Controllers\StockController::class, 'dashboard'])
+                ->name('stock.dashboard');
+
+
+
             //New kashish
 
             Route::resource('regions', RegionController::class);
             Route::resource('categories', CategoryController::class);
             Route::resource('payments', PaymentController::class);
+            
+            //------------------sales------------------------------
+            // Dashboard
+            Route::get('/sales-dashboard', [DashboardsController::class,'index'])->name('sales.dashboard');
+
+            // Orders
+            Route::get('/sales-order', [OrdersController::class,'index'])->name('pages.sales.order');
+
+            Route::get('/sales-order/create', [OrdersController::class,'create'])->name('pages.sales.order.create');
+
+            Route::get('/sales-product/create', [OrdersController::class, 'addProduct'])->name('pages.sales.addproduct');
+            // Payment
+
+            Route::get('/sales-payment', [PaymentsController::class,'index'])->name('pages.sales.payment.index');
+
+            // Feedback
+            Route::get('/sales-feedback', [FeedbackController::class,'index'])->name('pages.sales.feedback.index');
+
+            Route::get('/sales-feedback/create', [FeedbackController::class,'create'])->name('pages.sales.feedback.create');
+
+            // Customer
+            Route::get('/sales-customer', [CustomerController::class,'index'])->name('pages.sales.customer.index');
+
+            Route::get('/sales-customer/create', [CustomerController::class,'create'])->name('pages.sales.customer.create');
+            // Enquiry
+
+            Route::get('/sales-enquiries', [EnquiryController::class,'index'])->name('pages.sales.enquiry.index');
+
+
+            Route::get('/sales-enquiries/create', [EnquiryController::class,'create'])->name('pages.sales.enquiry.create');
+
+            // Follow Ups
+            Route::get('/sales-followups', [FollowUpController::class,'index'])->name('pages.sales.followups');
+
+            Route::get('/sales-followups/create', [FollowUpController::class,'create'])->name('pages.sales.followups.create');
+
+            // Samples
+            Route::get('/sales-samples',[SampleController::class,'index'])->name('pages.sales.samples');
+
+            Route::get('/sales-samples/create',[SampleController::class,'create'])->name('pages.sales.samples.create');
+
+            //Reports
+            Route::get('/sales-reports', [ReportController::class,'index'])->name('pages.sales.reports');
+
+
+            //-----manufaccturing head----------------
+        Route::get('/product-head/dashboard', [PDashboardController::class, 'index'])->name('pages.product-head.dashboard');
+
+        Route::get('/production/dashboard', [ODashboardController::class, 'index'])->name('pages.production.dashboard');
+
+        Route::get('/dispatch/dashboard', [DDashboardController::class, 'index'])->name('pages.dispatch.dashboard');
+          Route::get('/qc/dashboard', [QDashboardController::class, 'index'])->name('pages.qc.dashboard');
 
 
 
-            Route::get('/sales-dashboard', [App\Http\Controllers\SalesController::class, 'dashboard'])
-    ->name('sales.dashboard');
-
-Route::get('/purchase-dashboard', [App\Http\Controllers\RawMaterialPurchaseController::class, 'dashboard'])
-    ->name('purchase.dashboard');
-
-Route::get('/production-dashboard', [App\Http\Controllers\ProductionController::class, 'dashboard'])
-    ->name('production.dashboard');
-
-Route::get('/stock-dashboard', [App\Http\Controllers\StockController::class, 'dashboard'])
-    ->name('stock.dashboard');
-
-
-
-
-
-Route::get('get-product-code/{category_id}', [FinishedProductController::class, 'getProductCode']);
 
 
 
 
 
 
+
+
+
+
+
+
+
+            //end kashish
+
+           
 
 
 

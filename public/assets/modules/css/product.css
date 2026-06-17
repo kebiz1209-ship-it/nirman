@@ -1,0 +1,205 @@
+.main-content-wrapper,
+.main-content-wrapper * {
+    font-family: inherit !important;
+}
+
+/* LABEL STYLE */
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+}
+
+.form-control,
+.select2-container--default .select2-selection--single {
+    height: 36px !important;
+    font-size: 13px !important;
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+.form-control:focus {
+    border-color: #93c5fd !important;
+    box-shadow: 0 0 0 0.15rem rgba(59, 130, 246, .15) !important;
+}
+
+/* TEXTAREA */
+textarea.form-control {
+    min-height: 80px;
+}
+
+/* ROW SPACING */
+.row {
+    margin-bottom: 6px;
+}
+
+/* FORM GROUP SPACING */
+.form-group {
+    margin-bottom: 10px;
+}
+
+/* ERROR TEXT */
+.text-danger {
+    font-size: 12px;
+}
+
+.content-header {
+    margin-bottom: 15px;
+}
+
+.back-btn {
+    font-size: 12px !important;
+    padding: 7px 14px !important;
+    border-radius: 6px !important;
+    font-weight: 600;
+}
+
+/* ALL DROPDOWNS */
+select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* height: 42px !important; */
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding-right: 45px !important;
+    background-color: #fff !important;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #6b7280 50%),
+        linear-gradient(135deg, #6b7280 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) calc(50% - 3px),
+        calc(100% - 12px) calc(50% - 3px);
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+    font-size: 14px !important;
+    color: #374151 !important;
+}
+
+select.form-control:focus {
+    border-color: #93c5fd !important;
+    box-shadow: 0 0 0 0.15rem rgba(59, 130, 246, .15) !important;
+    outline: none !important;
+}
+
+/* TABS STYLING */
+.product-tabs {
+      margin-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.nav-tabs {
+   
+    gap: 2px;
+}
+
+.nav-tabs .nav-link {
+   padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px 4px 0 0;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #3b82f6;
+    background: #f3f4f6;
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    background: #0d6efd;
+    color: #fff;
+    border-bottom: none;
+}
+
+.tab-content {
+    padding: 12px 0;
+}
+
+/* CHECKBOX STYLES */
+.checkbox-container {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+}
+
+.checkbox-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.checkbox-box {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-box input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.checkbox-box label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: 10px;
+}
+.table-box {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+.approval-row {
+    display: flex;
+    flex-wrap: nowrap; /* keep all in one line */
+    gap: 20px;
+    align-items: center;
+}
+
+.approval-row .checkbox-box {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.approval-row .checkbox-box label {
+    margin-left: 5px;
+    margin-bottom: 0;
+}

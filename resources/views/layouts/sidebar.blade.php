@@ -99,7 +99,7 @@
                 </a>
 
             </li> -->
-             <!-- @if (routePermission('product.index'))
+            <!-- @if (routePermission('product.index'))
                     <li class="menu_assign_class {{ request()->routeIs('finishedproducts.index') ? ' treeMenuActive' : '' }}"
                         data-menu__cid="irp_10"><a
                             href="{{ route('finishedproducts.index') }}">@lang('index.list_product')</a>
@@ -177,6 +177,26 @@
                             href="{{ route('finishedproducts.index') }}">@lang('index.list_product')</a>
                     </li>
                     @endif
+
+
+                    <li class="menu_assign_class {{ request()->routeIs('packagingcategory.*') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10">
+                        <a href="{{ route('packagingcategory.index') }}">
+                            Packaging Material Category List
+                        </a>
+                    </li>
+
+
+
+
+
+                    <li class="menu_assign_class {{ request()->routeIs('packaging.*') ? ' treeMenuActive' : '' }}"
+                        data-menu__cid="irp_10">
+                        <a href="{{ route('packaging.index') }}">
+                            Packaging Material List
+                        </a>
+                    </li>
+
                 </ul>
             </li>
             @endif

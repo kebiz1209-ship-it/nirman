@@ -15,13 +15,13 @@
     <a href="{{ route('home') }}" class="logo-wrapper">
 
         @php
-            $photo = isset($whiteLabelInfo->mini_logo)
-                ? 'uploads/white_label/' . $whiteLabelInfo->mini_logo
-                : 'frequent_changing/images/mini_logo.png';
+        $photo = isset($whiteLabelInfo->mini_logo)
+        ? 'uploads/white_label/' . $whiteLabelInfo->mini_logo
+        : 'frequent_changing/images/mini_logo.png';
 
-            $logo_lg = isset($whiteLabelInfo->logo)
-                ? 'uploads/white_label/' . $whiteLabelInfo->logo
-                : 'frequent_changing/images/logo.png';
+        $logo_lg = isset($whiteLabelInfo->logo)
+        ? 'uploads/white_label/' . $whiteLabelInfo->logo
+        : 'frequent_changing/images/logo.png';
         @endphp
 
         <span class="logo-lg">
@@ -34,12 +34,8 @@
 
     </a>
 
-    <a href="#"
-       class="sidebar-toggle set_collapse"
-       data-status="{{ session()->get('is_collapse') == 'Yes' ? 1 : 2 }}"
-       data-toggle="push-menu"
-       role="button"
-       style="transform: rotate(0deg); transition: 0.7s;">
+    <a href="#" class="sidebar-toggle set_collapse" data-status="{{ session()->get('is_collapse') == 'Yes' ? 1 : 2 }}"
+        data-toggle="push-menu" role="button" style="transform: rotate(0deg); transition: 0.7s;">
 
         <iconify-icon icon="solar:round-alt-arrow-left-broken" width="25"></iconify-icon>
 
@@ -52,81 +48,76 @@
 
     <div id="left_menu_to_scroll">
 
-<ul class="sidebar-menu ps ps--active-x ps--active-y tree" data-widget="tree">
+        <ul class="sidebar-menu ps ps--active-x ps--active-y tree" data-widget="tree">
 
-    <!-- DASHBOARD -->
-    <li class="{{ request()->is('sales-dashboard') ? 'active_sub_menu' : '' }}">
-        <a href="{{ route('sales.dashboard') }}">
-            <iconify-icon icon="solar:home-2-broken"></iconify-icon>
-            <span class="match_bold">Dashboard</span>
-        </a>
-    </li>
+            <!-- DASHBOARD -->
+            <!-- DASHBOARD -->
+            <li class="{{ request()->routeIs('pages.product-head.dashboard') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.dashboard') }}">
+                    <iconify-icon icon="solar:home-2-broken"></iconify-icon>
+                    <span class="match_bold">Dashboard</span>
+                </a>
+            </li>
 
-    <!-- ORDERS -->
-    <li>
-       <a href="javascript:void(0)">
-            <iconify-icon icon="solar:document-text-broken"></iconify-icon>
-            <span class="match_bold">Orders</span>
-        </a>
-    </li>
+            <!-- ORDERS -->
+            <li class="{{ request()->routeIs('pages.product-head.orders') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.orders') }}">
+                    <iconify-icon icon="solar:document-text-broken"></iconify-icon>
+                    <span class="match_bold">Orders</span>
+                </a>
+            </li>
 
-    <!-- PRODUCT AVAILABILITY -->
-    <li>
-       <a href="javascript:void(0)">
-            <iconify-icon icon="solar:box-minimalistic-broken"></iconify-icon>
-            <span class="match_bold">Product Availability</span>
-        </a>
-    </li>
+            <!-- PRODUCT AVAILABILITY -->
+            <li class="{{ request()->routeIs('pages.product-head.product-availability') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.product-availability') }}">
+                    <iconify-icon icon="solar:box-minimalistic-broken"></iconify-icon>
+                    <span class="match_bold">Product Availability</span>
+                </a>
+            </li>
 
-    <!-- COMMUNICATION CENTER -->
-    <li>
-        <a href="javascript:void(0)">
-            <iconify-icon icon="solar:chat-round-dots-broken"></iconify-icon>
-            <span class="match_bold">Communication Center</span>
-        </a>
-    </li>
+            <!-- COMMUNICATION CENTER -->
+            <li class="{{ request()->routeIs('pages.product-head.communication-center') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.communication-center') }}">
+                    <iconify-icon icon="solar:chat-round-dots-broken"></iconify-icon>
+                    <span class="match_bold">Communication Center</span>
+                </a>
+            </li>
 
-    <!-- APPROVAL CENTER -->
-    <li>
-        <a href="javascript:void(0)">
-            <iconify-icon icon="solar:check-circle-broken"></iconify-icon>
-            <span class="match_bold">Approval Center</span>
-        </a>
-    </li>
+            <!-- APPROVAL CENTER -->
+            <li class="{{ request()->routeIs('pages.product-head.approval-center') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.approval-center') }}">
+                    <iconify-icon icon="solar:check-circle-broken"></iconify-icon>
+                    <span class="match_bold">Approval Center</span>
+                </a>
+            </li>
 
-    <!-- PRODUCTION PLANNING -->
-    <li>
-        <a href="javascript:void(0)">
-            <iconify-icon icon="solar:clipboard-list-broken"></iconify-icon>
-            <span class="match_bold">Production Planning</span>
-        </a>
-    </li>
+            <!-- PRODUCTION PLANNING -->
+            <li class="{{ request()->routeIs('pages.product-head.production-planning') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.production-planning') }}">
+                    <iconify-icon icon="solar:clipboard-list-broken"></iconify-icon>
+                    <span class="match_bold">Production Planning</span>
+                </a>
+            </li>
 
-    <!-- PAYMENT FOLLOW UPS -->
-    <li>
-        <a href="javascript:void(0)">
-            <iconify-icon icon="solar:wallet-money-broken"></iconify-icon>
-            <span class="match_bold">Payment Follow Ups</span>
-        </a>
-    </li>
+            <!-- PAYMENT FOLLOW UPS -->
+            <li class="{{ request()->routeIs('pages.product-head.payment-followups') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.payment-followups') }}">
+                    <iconify-icon icon="solar:wallet-money-broken"></iconify-icon>
+                    <span class="match_bold">Payment Follow Ups</span>
+                </a>
+            </li>
 
-    <!-- CUSTOMER FEEDBACK -->
-    <!-- <li>
-       <a href="javascript:void(0)">
-            <iconify-icon icon="solar:chat-round-like-broken"></iconify-icon>
-            <span class="match_bold">Customer Feedback</span>
-        </a>
-    </li> -->
+            <!-- REPORTS -->
+            <li class="{{ request()->routeIs('pages.product-head.reports') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.reports') }}">
+                    <iconify-icon icon="solar:chart-2-broken"></iconify-icon>
+                    <span class="match_bold">Reports</span>
+                </a>
+            </li>
 
-    <!-- REPORTS -->
-    <li>
-        <a href="javascript:void(0)">
-            <iconify-icon icon="solar:chart-2-broken"></iconify-icon>
-            <span class="match_bold">Reports</span>
-        </a>
-    </li>
 
-</ul>
+
+        </ul>
 </section>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1,4 +1,25 @@
 <!-- ROW 1 -->
+
+
+<style>
+    .approval-row {
+    display: flex;
+    flex-wrap: nowrap; /* keep all in one line */
+    gap: 20px;
+    align-items: center;
+}
+
+.approval-row .checkbox-box {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.approval-row .checkbox-box label {
+    margin-left: 5px;
+    margin-bottom: 0;
+}
+</style>
 <div class="row">
     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
         <div class="form-group">
@@ -252,29 +273,35 @@
     <div class="col-md-12">
         <div class="checkbox-container">
             <div class="checkbox-title">Availability & Approvals</div>
-            <div class="checkbox-grid">
+
+            <div class="checkbox-grid approval-row">
                 <div class="checkbox-box">
-                    <input type="checkbox" name="sample_available" id="sample_available" value="1">
+                    <input type="checkbox" id="sample_available">
                     <label for="sample_available">Sample Available</label>
                 </div>
+
                 <div class="checkbox-box">
-                    <input type="checkbox" name="commercial_product_allowed" id="commercial_product_allowed" value="1">
+                    <input type="checkbox" id="commercial_product_allowed">
                     <label for="commercial_product_allowed">Commercial Product Allowed</label>
                 </div>
+
                 <div class="checkbox-box">
-                    <input type="checkbox" name="regulatory_approved" id="regulatory_approved" value="1">
+                    <input type="checkbox" id="regulatory_approved">
                     <label for="regulatory_approved">Regulatory Approved</label>
                 </div>
+
                 <div class="checkbox-box">
-                    <input type="checkbox" name="customer_approved" id="customer_approved" value="1">
+                    <input type="checkbox" id="customer_approved">
                     <label for="customer_approved">Customer Approved</label>
                 </div>
+
                 <div class="checkbox-box">
-                    <input type="checkbox" name="available_for_production" id="available_for_production" value="1">
+                    <input type="checkbox" id="available_for_production">
                     <label for="available_for_production">Available For Production</label>
                 </div>
+
                 <div class="checkbox-box">
-                    <input type="checkbox" name="nda_required" id="nda_required" value="1">
+                    <input type="checkbox" id="nda_required">
                     <label for="nda_required">NDA/MTA Required</label>
                 </div>
             </div>

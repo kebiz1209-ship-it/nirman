@@ -14,6 +14,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PackagingCategoryController;
+use App\Http\Controllers\PackagingController;
 use App\Http\Controllers\SalePerson\DashboardsController;
 use App\Http\Controllers\SalePerson\OrdersController;
 use App\Http\Controllers\SalePerson\PaymentsController;
@@ -27,6 +29,7 @@ use App\Http\Controllers\ProductHead\PDashboardController;
 use App\Http\Controllers\Production\ODashboardController;
 use App\Http\Controllers\Qc\QDashboardController;
 use App\Http\Controllers\Dispatch\DDashboardController;
+
 
 
 Route::get('clear-all', function () {
@@ -123,6 +126,14 @@ Route::group(['middleware' => ['XSS']], function () {
         /*resource routing*/
         Route::resource('accounts', App\Http\Controllers\AccountController::class);
         Route::resource('suppliers', App\Http\Controllers\SupplierController::class);
+        Route::get('suppliers/{id}/materials', 'SupplierController@materials')
+    ->name('suppliers.materials');
+
+Route::post('suppliers/{id}/materials', 'SupplierController@saveMaterials')
+    ->name('suppliers.materials.save');
+
+Route::get('supplier-materials/get-materials', 'SupplierController@getMaterials')
+    ->name('supplier.materials.get');
         Route::resource('customers', App\Http\Controllers\CustomerController::class);
         Route::resource('outlets', App\Http\Controllers\OutletController::class);
         Route::get('/outlets/{outlets}/select', [App\Http\Controllers\OutletController::class, 'select'])->name('outlets.select');
@@ -159,7 +170,12 @@ Route::group(['middleware' => ['XSS']], function () {
         Route::resource('role', RoleController::class);
 
 
+
+
         // kashish routes 
+
+        Route::resource('packagingcategory', PackagingCategoryController::class);
+Route::resource('packaging', PackagingController::class);
         Route::resource('products', ProductController::class);
         Route::resource('orders', OrderController::class);
         Route::get('/demo-page', function () {
@@ -471,8 +487,7 @@ Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
             Route::resource('categories', CategoryController::class);
             Route::resource('payments', PaymentController::class);
             
-            //------------------sales------------------------------
-            // Dashboard
+            //------------------sales Dashboard -----------
             Route::get('/sales-dashboard', [DashboardsController::class,'index'])->name('sales.dashboard');
 
             // Orders
@@ -481,7 +496,7 @@ Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
             Route::get('/sales-order/create', [OrdersController::class,'create'])->name('pages.sales.order.create');
 
             Route::get('/sales-product/create', [OrdersController::class, 'addProduct'])->name('pages.sales.addproduct');
-            // Payment
+          
 
             Route::get('/sales-payment', [PaymentsController::class,'index'])->name('pages.sales.payment.index');
 
@@ -516,7 +531,22 @@ Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
 
 
             //-----manufaccturing head----------------
-        Route::get('/product-head/dashboard', [PDashboardController::class, 'index'])->name('pages.product-head.dashboard');
+      
+Route::prefix('product-head')->name('pages.product-head.')->group(function () {
+
+        Route::get('/dashboard', [PDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/orders', [PDashboardController::class, 'orders'])
+            ->name('orders');
+
+        Route::get('/orders/create', [PDashboardController::class, 'createOrder'])
+            ->name('orders.create');
+        Route::get('/product-availability', [PDashboardController::class, 'productAvailability'])->name('product-availability');
+        Route::get('/communication-center', [PDashboardController::class, 'communicationCenter'])->name('communication-center');
+        Route::get('/approval-center', [PDashboardController::class, 'approvalCenter'])->name('approval-center');
+        Route::get('/production-planning', [PDashboardController::class, 'productionPlanning'])->name('production-planning');
+        Route::get('/payment-followups', [PDashboardController::class, 'paymentFollowups'])->name('payment-followups');
+        Route::get('/reports', [PDashboardController::class, 'reports'])->name('reports');
+    });
 
         Route::get('/production/dashboard', [ODashboardController::class, 'index'])->name('pages.production.dashboard');
 
@@ -525,9 +555,20 @@ Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
 
 
 
+            Route::get('/packagingcategory', [PackagingController::class, 'categoryIndex'])
+    ->name('packagingcategory.index');
 
+Route::get('/packagingcategory/create', [PackagingController::class, 'categoryCreate'])
+    ->name('packagingcategory.create');
 
+Route::post('/packagingcategory', [PackagingController::class, 'categoryStore'])
+    ->name('packagingcategory.store');
 
+Route::get('/packaging', [PackagingController::class, 'index'])
+    ->name('packaging.index');
+
+Route::get('/packaging/create', [PackagingController::class, 'create'])
+    ->name('packaging.create');
 
 
 

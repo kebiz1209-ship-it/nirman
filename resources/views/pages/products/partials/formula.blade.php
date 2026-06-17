@@ -1,5 +1,33 @@
+
+<style>
+   .checkbox-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    align-items: center;
+    overflow-x: auto;
+}
+
+.checkbox-box {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    margin-bottom: 0;
+}
+
+.checkbox-box input {
+    margin-right: 6px;
+}
+
+.checkbox-box label {
+    margin-bottom: 0;
+} 
+</style>    
+
+
 <!-- <div class="card mt-3"> -->
     <div class="card-body">
+
 
         <!-- Formula Basic Details -->
         <div class="border rounded p-3 mb-4">
@@ -42,52 +70,35 @@
 
         <!-- Approval Status -->
         <div class="border rounded p-3 mb-4">
-            <h6 class="font-weight-bold mb-3">Approval Status</h6>
+    <h6 class="font-weight-bold mb-3">Approval Status</h6>
 
-            <div class="checkbox-grid">
-
-                <div class="checkbox-box">
-                    <input type="radio"
-                           name="approval_status"
-                           id="draft"
-                           value="Draft"
-                           checked>
-                    <label for="draft">Draft</label>
-                </div>
-
-                <div class="checkbox-box">
-                    <input type="radio"
-                           name="approval_status"
-                           id="review"
-                           value="Review">
-                    <label for="review">Review</label>
-                </div>
-
-                <div class="checkbox-box">
-                    <input type="radio"
-                           name="approval_status"
-                           id="approved"
-                           value="Approved">
-                    <label for="approved">Approved</label>
-                </div>
-
-                <div class="checkbox-box">
-                    <input type="radio"
-                           name="approval_status"
-                           id="rejected"
-                           value="Rejected">
-                    <label for="rejected">Rejected</label>
-                </div>
-                <div class="checkbox-box">
-                    <input type="radio"
-                           name="approval_status"
-                           id="ipbased"
-                           value="IP Based">
-                    <label for="ipbased">IP Based</label>
-                </div>
-
-            </div>
+    <div class="checkbox-grid">
+        <div class="checkbox-box">
+            <input type="radio" name="approval_status" id="draft" value="Draft" checked>
+            <label for="draft">Draft</label>
         </div>
+
+        <div class="checkbox-box">
+            <input type="radio" name="approval_status" id="review" value="Review">
+            <label for="review">Review</label>
+        </div>
+
+        <div class="checkbox-box">
+            <input type="radio" name="approval_status" id="approved" value="Approved">
+            <label for="approved">Approved</label>
+        </div>
+
+        <div class="checkbox-box">
+            <input type="radio" name="approval_status" id="rejected" value="Rejected">
+            <label for="rejected">Rejected</label>
+        </div>
+
+        <div class="checkbox-box">
+            <input type="radio" name="approval_status" id="ipbased" value="IP Based">
+            <label for="ipbased">IP Based</label>
+        </div>
+    </div>
+</div>
 
         <!-- Effective Dates -->
         <div class="border rounded p-3 mb-4">

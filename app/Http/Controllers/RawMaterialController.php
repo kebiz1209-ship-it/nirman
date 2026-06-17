@@ -1,19 +1,5 @@
 <?php
-/*
-  ##############################################################################
-  # iProduction - Production and Manufacture Management Software
-  ##############################################################################
-  # AUTHOR:		Door Soft
-  ##############################################################################
-  # EMAIL:		info@doorsoft.co
-  ##############################################################################
-  # COPYRIGHT:		RESERVED BY Door Soft
-  ##############################################################################
-  # WEBSITE:		https://www.doorsoft.co
-  ##############################################################################
-  # This is RawMaterialController
-  ##############################################################################
- */
+
 
 namespace App\Http\Controllers;
 
@@ -88,11 +74,19 @@ class RawMaterialController extends Controller
         $obj->consumption_unit = null_check(escape_output($request->get('consumption_unit')));
         $obj->unit = null_check(escape_output($request->get('unit')));
         $obj->rate_per_unit = null_check(escape_output($request->get('rate_per_unit')));
+        $obj->grade = null_check(escape_output($request->get('grade')));
+        $obj->potency = null_check(escape_output($request->get('potency')));
+        $obj->alias = null_check(escape_output($request->get('alias')));
         $obj->consumption_check = null_check(escape_output($request->get('consumption_check')));
         $obj->conversion_rate = null_check(escape_output($request->get('conversion_rate')));
         $obj->rate_per_consumption_unit = null_check(escape_output($request->get('rate_per_consumption_unit')));
         $obj->opening_stock = null_check(escape_output($request->get('opening_stock')));
         $obj->alert_level = null_check(escape_output($request->get('alert_level')));
+
+        $obj->grade = null_check(escape_output($request->get('grade')));
+        $obj->potency = null_check(escape_output($request->get('potency')));
+        $obj->alias = null_check(escape_output($request->get('alias')));
+
         $obj->added_by = auth()->user()->id;
         $obj->save();
         return redirect('rawmaterials')->with(saveMessage());
@@ -148,7 +142,11 @@ class RawMaterialController extends Controller
         $rawmaterial->rate_per_consumption_unit = null_check(escape_output($request->get('rate_per_consumption_unit')));
         $rawmaterial->opening_stock = null_check(escape_output($request->get('opening_stock')));
         $rawmaterial->alert_level = null_check(escape_output($request->get('alert_level')));
+        $rawmaterial->grade = null_check(escape_output($request->get('grade')));
+        $rawmaterial->potency = null_check(escape_output($request->get('potency')));
+        $rawmaterial->alias = null_check(escape_output($request->get('alias')));
         $rawmaterial->added_by = auth()->user()->id;
+        
         $rawmaterial->save();
         return redirect('rawmaterials')->with(updateMessage());
     }

@@ -20,6 +20,10 @@ namespace App\Http\Controllers;
 use App\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\SupplierMaterial;
+use App\PackagingMaterial;
+use App\RawMaterial;
+use App\RawMaterialCategory;
 
 class SupplierController extends Controller
 {
@@ -152,4 +156,43 @@ class SupplierController extends Controller
         $supplier->save();
         return redirect('suppliers')->with(deleteMessage());
     }
+
+
+public function materialsIndex($id)
+{
+    $supplier = Supplier::findOrFail(
+        encrypt_decrypt($id, 'decrypt')
+    );
+
+    $title = 'Supplier Materials';
+
+    return view(
+        'pages.supplier.assign_materials',
+        compact(
+            'title',
+            'supplier'
+        )
+    );
+}
+public function createMaterial($id)
+{
+    $supplier = Supplier::findOrFail(
+        encrypt_decrypt($id, 'decrypt')
+    );
+
+    $title = 'Assign Materials';
+
+    return view(
+        'pages.supplier.add_material',
+        compact(
+            'title',
+            'supplier'
+        )
+    );
+}
+public function materials($id)
+{
+   return view(
+        'pages.supplier.assign_materials');
+}
 }

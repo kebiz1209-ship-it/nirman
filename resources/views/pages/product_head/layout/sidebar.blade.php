@@ -68,10 +68,18 @@
             </li>
 
             <!-- PRODUCT AVAILABILITY -->
-            <li class="{{ request()->routeIs('pages.product-head.product-availability') ? 'active_sub_menu' : '' }}">
-                <a href="{{ route('pages.product-head.product-availability') }}">
-                    <iconify-icon icon="solar:box-minimalistic-broken"></iconify-icon>
-                    <span class="match_bold">Product Availability</span>
+<li class="{{ request()->routeIs('pages.product-head.product-availability*') ? 'active_sub_menu' : '' }}">
+    <a href="{{ route('pages.product-head.product-availability') }}">
+        <iconify-icon icon="solar:box-minimalistic-broken"></iconify-icon>
+        <span class="match_bold">Product Availability</span>
+    </a>
+</li>
+
+
+ <li class="{{ request()->routeIs('pages.product-head.boq') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.boq') }}">
+                    <iconify-icon icon="solar:chart-2-broken"></iconify-icon>
+                    <span class="match_bold">BOQ</span>
                 </a>
             </li>
 
@@ -99,11 +107,10 @@
                 </a>
             </li>
 
-            <!-- PAYMENT FOLLOW UPS -->
-            <li class="{{ request()->routeIs('pages.product-head.payment-followups') ? 'active_sub_menu' : '' }}">
-                <a href="{{ route('pages.product-head.payment-followups') }}">
-                    <iconify-icon icon="solar:wallet-money-broken"></iconify-icon>
-                    <span class="match_bold">Payment Follow Ups</span>
+            <li class="{{ request()->routeIs('pages.product-head.activity') ? 'active_sub_menu' : '' }}">
+                <a href="{{ route('pages.product-head.activity') }}">
+                    <iconify-icon icon="solar:chart-2-broken"></iconify-icon>
+                    <span class="match_bold">Activity plan</span>
                 </a>
             </li>
 

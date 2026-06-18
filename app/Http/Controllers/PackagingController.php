@@ -49,6 +49,8 @@ class PackagingController extends Controller
 }
     public function create()
 {
+
+
     $categories = PackagingCategory::where('status', 'Active')->get();
 
     return view('pages.packaging.create', compact('categories'));
@@ -57,17 +59,21 @@ class PackagingController extends Controller
 public function store(Request $request)
 {
     $request->validate([
-        'name' => 'required',
-        'code' => 'required|unique:packagings,code',
+        'name'        => 'required',
+        'code'        => 'required|unique:packagings,code',
         'category_id' => 'required|exists:packaging_categories,id',
+        'level'       => 'required',
+        'unit'        => 'required',
     ]);
+
+    // dd($request->all());
 
     Packaging::create([
         'category_id'   => $request->category_id,
         'name'          => $request->name,
         'code'          => $request->code,
         'size'          => $request->size,
-        'weight'        => $request->weight,
+        'weight'        => $request->weight,        
         'height'        => $request->height,
         'fill_qty'      => $request->fill_qty,
         'level'         => $request->level,

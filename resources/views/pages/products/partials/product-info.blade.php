@@ -177,7 +177,6 @@
 </div>
 
 <!-- ROW 5 -->
-<!-- ROW 5 -->
 <div class="row">
 
     <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
@@ -238,14 +237,6 @@
     </div>
 
 </div>
-
-<!-- ROW 7 - Customer Information
-<div class="row">
-   
-</div> -->
-
-
-
 
 <!-- ROW 6 - Specifications & Dosage -->
 <div class="row">

@@ -12,14 +12,14 @@ class PDashboardController extends Controller
         return view('pages.product_head.dashboard');
     }
 
-    public function orders()
-    {
-        return view('pages.product_head.orders.index');
-    }
 
-    public function createOrder()
+public function viewProductAvailability()
 {
-    return view('pages.product_head.orders.create');
+
+    return view(
+        'pages.product_head.product_availability.view'
+    );
+
 }
 
     public function productAvailability()

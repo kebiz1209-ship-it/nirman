@@ -50,10 +50,10 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h4>Order Management</h4>
 
-            <a href="{{ route('pages.product-head.orders.create') }}"
+            <!-- <a href="{{ route('pages.product-head.orders.create') }}"
                class="btn btn-primary">
                 <i class="fa fa-plus"></i> Add Order
-            </a>
+            </a> -->
         </div>
 
         <div class="card-body">
@@ -161,7 +161,11 @@
                             </td>
                             <td>Rahul Sharma</td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-warning">
+                             <a href="{{ route('pages.product-head.orders.info-review') }}" class="btn btn-sm" style="background-color:#00c0ef;">
+                                   info-review
+                                </a>
+
+                                <a href="{{ route('pages.product-head.orders.view') }}" class="btn btn-sm btn-warning">
                                     View
                                 </a>
                             </td>

@@ -28,4 +28,12 @@ class Supplier extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function materials()
+{
+    return $this->hasMany(
+        SupplierMaterial::class,
+        'supplier_id'
+    );
+}
 }

@@ -181,4 +181,12 @@ class RawMaterial extends Model
         }
     }
 
+    public function suppliers()
+{
+    return $this->hasMany(
+        SupplierMaterial::class,
+        'material_id'
+    )->where('material_type', 'raw');
+}
+
 }

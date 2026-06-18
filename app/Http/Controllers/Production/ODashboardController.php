@@ -11,4 +11,12 @@ class ODashboardController extends Controller
     {
         return view('pages.production.dashboard');
     }
+    public function order()
+    {
+        return view('pages.production.order.index');
+    }
+     public function orderPlan()
+    {
+        return view('pages.production.order.planner');
+    }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ForecastingController;
 use App\Http\Controllers\MailSettingController;
+use App\Http\Controllers\ProductHead\POrderControllerController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
@@ -26,6 +27,8 @@ use App\Http\Controllers\SalePerson\FeedbackController;
 use App\Http\Controllers\SalePerson\SampleController;
 use App\Http\Controllers\SalePerson\ReportController;
 use App\Http\Controllers\ProductHead\PDashboardController;
+use App\Http\Controllers\ProductHead\POrderController;
+use App\Http\Controllers\ProductHead\PActivityController;
 use App\Http\Controllers\Production\ODashboardController;
 use App\Http\Controllers\Qc\QDashboardController;
 use App\Http\Controllers\Dispatch\DDashboardController;
@@ -123,17 +126,25 @@ Route::group(['middleware' => ['XSS']], function () {
         Route::get('getBatchControlProduct', [App\Http\Controllers\AjaxController::class, 'getBatchControlProduct'])->name('getBatchControlProduct.post');
         Route::get('getProduct', [App\Http\Controllers\AjaxController::class, 'getProduct'])->name('getProduct');
 
-        /*resource routing*/
+      
         Route::resource('accounts', App\Http\Controllers\AccountController::class);
-        Route::resource('suppliers', App\Http\Controllers\SupplierController::class);
-        Route::get('suppliers/{id}/materials', 'SupplierController@materials')
-    ->name('suppliers.materials');
 
-Route::post('suppliers/{id}/materials', 'SupplierController@saveMaterials')
-    ->name('suppliers.materials.save');
+        Route::resource('suppliers', 'SupplierController');
 
-Route::get('supplier-materials/get-materials', 'SupplierController@getMaterials')
-    ->name('supplier.materials.get');
+        Route::prefix('suppliers')->name('suppliers.')->group(function () {
+            Route::get('{id}/materials', 'SupplierController@materials')->name('materials');
+            Route::get('{id}/materials/list', 'SupplierController@materialsIndex')->name('materials.index');
+            Route::get('{id}/materials/create', 'SupplierController@createMaterial')->name('materials.create');
+            Route::post('{id}/materials', 'SupplierController@saveMaterials')->name('materials.save');
+        });
+
+        Route::prefix('supplier-materials')->name('supplier.materials.')->group(function () {
+
+                Route::get('get-materials', 'SupplierController@getMaterials')->name('get');
+
+        });
+
+
         Route::resource('customers', App\Http\Controllers\CustomerController::class);
         Route::resource('outlets', App\Http\Controllers\OutletController::class);
         Route::get('/outlets/{outlets}/select', [App\Http\Controllers\OutletController::class, 'select'])->name('outlets.select');
@@ -175,7 +186,7 @@ Route::get('supplier-materials/get-materials', 'SupplierController@getMaterials'
         // kashish routes 
 
         Route::resource('packagingcategory', PackagingCategoryController::class);
-Route::resource('packaging', PackagingController::class);
+        Route::resource('packaging', PackagingController::class);
         Route::resource('products', ProductController::class);
         Route::resource('orders', OrderController::class);
         Route::get('/demo-page', function () {
@@ -489,86 +500,74 @@ Route::post('/set-collapse', function (\Illuminate\Http\Request $request) {
             
             //------------------sales Dashboard -----------
             Route::get('/sales-dashboard', [DashboardsController::class,'index'])->name('sales.dashboard');
-
-            // Orders
             Route::get('/sales-order', [OrdersController::class,'index'])->name('pages.sales.order');
-
             Route::get('/sales-order/create', [OrdersController::class,'create'])->name('pages.sales.order.create');
-
             Route::get('/sales-product/create', [OrdersController::class, 'addProduct'])->name('pages.sales.addproduct');
-          
-
             Route::get('/sales-payment', [PaymentsController::class,'index'])->name('pages.sales.payment.index');
-
-            // Feedback
             Route::get('/sales-feedback', [FeedbackController::class,'index'])->name('pages.sales.feedback.index');
-
             Route::get('/sales-feedback/create', [FeedbackController::class,'create'])->name('pages.sales.feedback.create');
-
-            // Customer
             Route::get('/sales-customer', [CustomerController::class,'index'])->name('pages.sales.customer.index');
-
             Route::get('/sales-customer/create', [CustomerController::class,'create'])->name('pages.sales.customer.create');
-            // Enquiry
-
             Route::get('/sales-enquiries', [EnquiryController::class,'index'])->name('pages.sales.enquiry.index');
-
-
             Route::get('/sales-enquiries/create', [EnquiryController::class,'create'])->name('pages.sales.enquiry.create');
-
-            // Follow Ups
             Route::get('/sales-followups', [FollowUpController::class,'index'])->name('pages.sales.followups');
-
             Route::get('/sales-followups/create', [FollowUpController::class,'create'])->name('pages.sales.followups.create');
-
-            // Samples
             Route::get('/sales-samples',[SampleController::class,'index'])->name('pages.sales.samples');
-
             Route::get('/sales-samples/create',[SampleController::class,'create'])->name('pages.sales.samples.create');
-
-            //Reports
             Route::get('/sales-reports', [ReportController::class,'index'])->name('pages.sales.reports');
 
 
             //-----manufaccturing head----------------
       
-Route::prefix('product-head')->name('pages.product-head.')->group(function () {
+        Route::prefix('product-head')->name('pages.product-head.')->group(function () {
 
-        Route::get('/dashboard', [PDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/orders', [PDashboardController::class, 'orders'])
-            ->name('orders');
+            Route::get('/dashboard', [PDashboardController::class, 'index'])->name('dashboard');
+            Route::get('/orders', [POrderController::class, 'orders'])->name('orders');
+            Route::get('/orders/create', [POrderController::class, 'createOrder'])->name('orders.create');
+            Route::get('/orders/view', [POrderController::class, 'viewOrder'])->name('orders.view');
+             Route::get('/orders/info-review', [POrderController::class, 'infoReview'])->name('orders.info-review');
+            
+            Route::get('/product-availability',
+            [PDashboardController::class,'productAvailability'])
+            ->name('product-availability');
 
-        Route::get('/orders/create', [PDashboardController::class, 'createOrder'])
-            ->name('orders.create');
-        Route::get('/product-availability', [PDashboardController::class, 'productAvailability'])->name('product-availability');
-        Route::get('/communication-center', [PDashboardController::class, 'communicationCenter'])->name('communication-center');
-        Route::get('/approval-center', [PDashboardController::class, 'approvalCenter'])->name('approval-center');
-        Route::get('/production-planning', [PDashboardController::class, 'productionPlanning'])->name('production-planning');
-        Route::get('/payment-followups', [PDashboardController::class, 'paymentFollowups'])->name('payment-followups');
-        Route::get('/reports', [PDashboardController::class, 'reports'])->name('reports');
-    });
 
+            Route::get('/product-availability/view',
+            [PDashboardController::class,'viewProductAvailability'])
+            ->name('product-availability.view');
+
+
+             Route::get('/boq', [POrderController::class, 'boq'])->name('boq');
+              Route::get('/boq/create', [POrderController::class, 'createBoq'])->name('boq.create');
+
+
+            
+            Route::get('/communication-center', [PDashboardController::class, 'communicationCenter'])->name('communication-center');
+            Route::get('/approval-center', [PDashboardController::class, 'approvalCenter'])->name('approval-center');
+            Route::get('/production-planning', [PDashboardController::class, 'productionPlanning'])->name('production-planning');
+
+            Route::get('/activity', [PActivityController::class, 'activity'])->name('activity');
+            Route::get('/activity/create', [PActivityController::class, 'createActivity'])->name('activity.create');
+            Route::get('/payment-followups', [PDashboardController::class, 'paymentFollowups'])->name('payment-followups');
+            Route::get('/reports', [PDashboardController::class, 'reports'])->name('reports');
+        });
+
+
+            //---------Production----------------
         Route::get('/production/dashboard', [ODashboardController::class, 'index'])->name('pages.production.dashboard');
+        Route::get('/production/order', [ODashboardController::class, 'order'])->name('pages.production.order');
+        Route::get('/production/order/planner', [ODashboardController::class, 'orderPlan'])->name('pages.production.order.planner');
 
         Route::get('/dispatch/dashboard', [DDashboardController::class, 'index'])->name('pages.dispatch.dashboard');
           Route::get('/qc/dashboard', [QDashboardController::class, 'index'])->name('pages.qc.dashboard');
 
 
 
-            Route::get('/packagingcategory', [PackagingController::class, 'categoryIndex'])
-    ->name('packagingcategory.index');
-
-Route::get('/packagingcategory/create', [PackagingController::class, 'categoryCreate'])
-    ->name('packagingcategory.create');
-
-Route::post('/packagingcategory', [PackagingController::class, 'categoryStore'])
-    ->name('packagingcategory.store');
-
-Route::get('/packaging', [PackagingController::class, 'index'])
-    ->name('packaging.index');
-
-Route::get('/packaging/create', [PackagingController::class, 'create'])
-    ->name('packaging.create');
+        Route::get('/packagingcategory', [PackagingController::class, 'categoryIndex'])->name('packagingcategory.index');
+        Route::get('/packagingcategory/create', [PackagingController::class, 'categoryCreate'])->name('packagingcategory.create');
+        Route::post('/packagingcategory', [PackagingController::class, 'categoryStore'])->name('packagingcategory.store');
+        Route::get('/packaging', [PackagingController::class, 'index'])->name('packaging.index');
+        Route::get('/packaging/create', [PackagingController::class, 'create'])->name('packaging.create');
 
 
 

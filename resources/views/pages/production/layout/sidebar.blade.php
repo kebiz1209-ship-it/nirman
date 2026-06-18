@@ -55,16 +55,16 @@
 <ul class="sidebar-menu ps ps--active-x ps--active-y tree" data-widget="tree">
 
     <!-- DASHBOARD -->
-    <li class="{{ request()->is('sales-dashboard') ? 'active_sub_menu' : '' }}">
-        <a href="{{ route('sales.dashboard') }}">
+    <li class="{{ request()->is('pages.production.dashboard') ? 'active_sub_menu' : '' }}">
+        <a href="{{ route('pages.production.dashboard') }}">
             <iconify-icon icon="solar:home-2-broken"></iconify-icon>
             <span class="match_bold">Dashboard</span>
         </a>
     </li>
 
-    <!-- ORDERS -->
     <li>
-       <a href="javascript:void(0)">
+       <!-- <a href="{{ route('pages.production.order') }}"> -->
+        <a href="javascript:void(0)">
             <iconify-icon icon="solar:document-text-broken"></iconify-icon>
             <span class="match_bold">Production Orders</span>
         </a>

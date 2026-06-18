@@ -139,14 +139,14 @@
         <td>{{ $packaging->fill_qty }}</td>
 
         <td>
-            @if($packaging->level == 'Primary')
-                <span class="badge badge-primary">Primary</span>
-            @elseif($packaging->level == 'Secondary')
-                <span class="badge badge-info">Secondary</span>
-            @else
-                <span class="badge badge-dark">Tertiary</span>
-            @endif
-        </td>
+    @if($packaging->level == 'Primary')
+        <span class="badge bg-primary">Primary</span>
+    @elseif($packaging->level == 'Secondary')
+        <span class="badge bg-info">Secondary</span>
+    @else
+        <span class="badge bg-dark">Tertiary</span>
+    @endif
+</td>
 
         <td>{{ $packaging->unit }}</td>
 
@@ -157,16 +157,12 @@
         <td>{{ $packaging->alert_level }}</td>
 
         <td>
-            @if($packaging->status == 'Active')
-                <span class="badge badge-success">
-                    Active
-                </span>
-            @else
-                <span class="badge badge-danger">
-                    Inactive
-                </span>
-            @endif
-        </td>
+    @if($packaging->status == 'Active')
+        <span class="badge bg-success">Active</span>
+    @else
+        <span class="badge bg-danger">Inactive</span>
+    @endif
+</td>
 
         <td>
             <a href="{{ route('packaging.edit', $packaging->id) }}"

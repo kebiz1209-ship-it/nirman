@@ -39,9 +39,9 @@
             <p class="po-title">Production orders</p>
             <p class="po-subtitle">2 active orders</p>
         </div>
-        <a href="#" class="btn-plan">
+        <!-- <a href="#" class="btn-plan">
             <i class="fa fa-plus"></i> New order
-        </a>
+        </a> -->
     </div>
 
     <div class="po-card">

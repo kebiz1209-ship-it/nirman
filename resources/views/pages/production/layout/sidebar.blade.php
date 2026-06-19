@@ -63,8 +63,8 @@
     </li>
 
     <li>
-       <!-- <a href="{{ route('pages.production.order') }}"> -->
-        <a href="javascript:void(0)">
+       <a href="{{ route('pages.production.order') }}">
+        <!-- <a href="javascript:void(0)"> -->
             <iconify-icon icon="solar:document-text-broken"></iconify-icon>
             <span class="match_bold">Production Orders</span>
         </a>

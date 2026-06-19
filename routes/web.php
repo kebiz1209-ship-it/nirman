@@ -136,6 +136,7 @@ Route::group(['middleware' => ['XSS']], function () {
             Route::get('{id}/materials/list', 'SupplierController@materialsIndex')->name('materials.index');
             Route::get('{id}/materials/create', 'SupplierController@createMaterial')->name('materials.create');
             Route::post('{id}/materials', 'SupplierController@saveMaterials')->name('materials.save');
+            Route::post('/material/store/{id}','SupplierController@storeMaterial')->name('supplier.material.store');
         });
 
         Route::prefix('supplier-materials')->name('supplier.materials.')->group(function () {

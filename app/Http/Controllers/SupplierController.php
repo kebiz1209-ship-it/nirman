@@ -1,20 +1,4 @@
 <?php
-/*
-  ##############################################################################
-  # iProduction - Production and Manufacture Management Software
-  ##############################################################################
-  # AUTHOR:		Door Soft
-  ##############################################################################
-  # EMAIL:		info@doorsoft.co
-  ##############################################################################
-  # COPYRIGHT:		RESERVED BY Door Soft
-  ##############################################################################
-  # WEBSITE:		https://www.doorsoft.co
-  ##############################################################################
-  # This is SupplierController
-  ##############################################################################
- */
-
 namespace App\Http\Controllers;
 
 use App\Supplier;
@@ -24,6 +8,10 @@ use App\SupplierMaterial;
 use App\PackagingMaterial;
 use App\RawMaterial;
 use App\RawMaterialCategory;
+use Illuminate\Support\Facades\DB;
+use App\Models\PackagingCategory;
+use App\Models\Packaging;
+use App\Models\SupplierMaterialAssignment;
 
 class SupplierController extends Controller
 {
@@ -164,13 +152,45 @@ public function materialsIndex($id)
         encrypt_decrypt($id, 'decrypt')
     );
 
-    $title = 'Supplier Materials';
+    $materials = DB::table('supplier_material_assignments as sma')
+
+        ->leftJoin('tbl_rawmaterials as rm', 'rm.id', '=', 'sma.raw_material_id')
+
+        ->leftJoin('packagings as p', 'p.id', '=', 'sma.packaging_id')
+
+        ->leftJoin('tbl_rmcategory as rmc', 'rmc.id', '=', 'rm.category')
+
+        ->leftJoin('packaging_categories as pc', 'pc.id', '=', 'p.category_id')
+
+        ->where('sma.supplier_id', $supplier->id)
+
+        ->select(
+            'sma.id',
+
+            'sma.raw_material_id',
+            'sma.packaging_id',
+
+            'rm.name as raw_name',
+            'rm.code as raw_code',
+            'rm.unit as raw_unit',
+
+            'rmc.name as raw_category',
+
+            'p.name as packaging_name',
+            'p.code as packaging_code',
+            'p.unit as packaging_unit',
+
+            'pc.category_name as packaging_category'
+        )
+
+        ->latest('sma.id')
+        ->get();
 
     return view(
         'pages.supplier.assign_materials',
         compact(
-            'title',
-            'supplier'
+            'supplier',
+            'materials'
         )
     );
 }
@@ -180,15 +200,126 @@ public function createMaterial($id)
         encrypt_decrypt($id, 'decrypt')
     );
 
+    // Raw Material Categories
+    $rawCategories = RawMaterialCategory::where('del_status', 'Live')
+        ->orderBy('name')
+        ->get();
+
+    $rawMaterials = RawMaterial::where('del_status', 'Live')
+        ->orderBy('name')
+        ->get()
+        ->groupBy('category');
+
+    // Packaging Categories
+    $packagingCategories = PackagingCategory::where('status', 'Active')
+        ->orderBy('category_name')
+        ->get();
+
+    $packagingMaterials = Packaging::where('status', 'Active')
+        ->orderBy('name')
+        ->get()
+        ->groupBy('category_id');
+
+    // Already assigned raw materials
+    $assignedRawMaterials = SupplierMaterialAssignment::where(
+            'supplier_id',
+            $supplier->id
+        )
+        ->whereNotNull('raw_material_id')
+        ->pluck('raw_material_id')
+        ->toArray();
+
+    // Already assigned packaging materials
+    $assignedPackagingMaterials = SupplierMaterialAssignment::where(
+            'supplier_id',
+            $supplier->id
+        )
+        ->whereNotNull('packaging_id')
+        ->pluck('packaging_id')
+        ->toArray();
+
     $title = 'Assign Materials';
 
     return view(
         'pages.supplier.add_material',
         compact(
             'title',
-            'supplier'
+            'supplier',
+            'rawCategories',
+            'rawMaterials',
+            'packagingCategories',
+            'packagingMaterials',
+            'assignedRawMaterials',
+            'assignedPackagingMaterials'
         )
     );
+}
+public function storeMaterial(Request $request, $id)
+{
+    $supplier = Supplier::findOrFail(
+        encrypt_decrypt($id, 'decrypt')
+    );
+
+    DB::beginTransaction();
+
+    try {
+
+
+        if ($request->has('raw_materials')) {
+
+            foreach ($request->raw_materials as $rawMaterialId) {
+
+                SupplierMaterialAssignment::firstOrCreate(
+                    [
+                        'supplier_id'     => $supplier->id,
+                        'raw_material_id' => $rawMaterialId
+                    ],
+                    [
+                        'packaging_id' => null
+                    ]
+                );
+            }
+        }
+
+
+
+        if ($request->has('packaging_materials')) {
+
+            foreach ($request->packaging_materials as $packagingId) {
+
+                SupplierMaterialAssignment::firstOrCreate(
+                    [
+                        'supplier_id'  => $supplier->id,
+                        'packaging_id' => $packagingId
+                    ],
+                    [
+                        'raw_material_id' => null
+                    ]
+                );
+            }
+        }
+
+        DB::commit();
+
+        return redirect()
+            ->route(
+                'suppliers.materials.index',
+                encrypt_decrypt($supplier->id, 'encrypt')
+            )
+            ->with(
+                'success',
+                'Materials Assigned Successfully'
+            );
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->with(
+            'error',
+            $e->getMessage()
+        );
+    }
 }
 public function materials($id)
 {
